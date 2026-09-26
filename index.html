@@ -13,6 +13,7 @@
             --text-muted: #888888;
             --border-color: #eeeeee;
             --bg-color: #fcfcfc;
+            --danger-color: #ff6b6b;
         }
 
         body {
@@ -77,7 +78,7 @@
             padding: 10px 12px;
             font-size: 14px;
             font-family: 'Inter', sans-serif;
-            border: 2px solid var(--primary-color); /* Borde rojo para indicar obligatorio */
+            border: 2px solid var(--primary-color);
             border-radius: 8px;
             flex-grow: 1;
             text-transform: uppercase;
@@ -101,7 +102,39 @@
             white-space: nowrap;
         }
 
-        /* --- DISEÑO DE LA TABLA (COMPACTO COMO LA IMAGEN DE FRUTAS) --- */
+        /* --- CUADRO DE PREGUNTAS --- */
+        .question-box {
+            background: #f9f9f9;
+            padding: 12px 15px;
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 20px;
+            width: fit-content;
+        }
+
+        .question-box label {
+            font-weight: 500;
+            font-size: 14px;
+        }
+
+        .radio-group {
+            display: flex;
+            gap: 15px;
+        }
+
+        .radio-group label {
+            font-weight: 400;
+            font-size: 14px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        /* --- DISEÑO DE LA TABLA COMPACTA --- */
         .table-responsive {
             overflow-x: auto;
             border: 1px solid var(--border-color);
@@ -115,18 +148,17 @@
             width: 100%;
         }
 
-        /* Hace que la tabla de servicios se encoja y no estire sus columnas */
         #servicios-table {
             width: fit-content;
-            min-width: 100%; /* En celular ocupa el 100%, en PC se encoje si hay poco contenido */
+            min-width: 100%;
         }
 
         th, td {
-            padding: 6px 4px; /* ¡Súper reducido para que queden juntos! */
+            padding: 6px 4px;
             text-align: center;
             vertical-align: middle;
             border-bottom: 1px solid var(--border-color);
-            white-space: nowrap; /* Evita que el texto se parta en dos líneas */
+            white-space: nowrap;
         }
 
         th {
@@ -136,18 +168,16 @@
             background-color: #ffffff;
         }
 
-        /* La primera columna se encoge al tamaño justo del texto */
         th:first-child, td:first-child {
             text-align: left;
             padding-left: 10px;
-            width: 1%; /* Magia de CSS para que sea lo más pequeña posible */
+            width: 1%;
         }
 
         tbody tr:last-child td {
             border-bottom: none;
         }
 
-        /* Input de texto editable (ocupa el tamaño de su columna) */
         input[type="text"].editable-text {
             border: none;
             background: transparent;
@@ -155,7 +185,7 @@
             font-size: 13px;
             color: var(--text-main);
             width: 100%;
-            min-width: 110px; /* Tamaño mínimo para poder tocar en celular */
+            min-width: 110px;
             padding: 4px;
             border-radius: 4px;
         }
@@ -165,7 +195,6 @@
             background: #f0f0f0;
         }
 
-        /* Cuadros numéricos compactos */
         .cell-number-input {
             width: 30px;
             height: 30px;
@@ -185,7 +214,32 @@
             border-color: var(--primary-color);
         }
 
-        /* Checkboxes grandes y juntos */
+        /* --- BOTONES DE ELIMINAR --- */
+        .btn-del-row, .btn-del-col {
+            background: #ffe5e5;
+            color: var(--danger-color);
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 12px;
+            font-weight: bold;
+            padding: 2px 6px;
+            margin-left: 5px;
+            transition: all 0.2s;
+        }
+        
+        .btn-del-col {
+            margin-left: 6px;
+            padding: 0px 5px;
+            font-size: 11px;
+        }
+
+        .btn-del-row:hover, .btn-del-col:hover {
+            background: var(--danger-color);
+            color: white;
+        }
+
+        /* --- CHECKBOXES --- */
         .checkbox-wrapper {
             display: flex;
             justify-content: center;
@@ -195,7 +249,7 @@
         input[type="checkbox"] {
             appearance: none;
             -webkit-appearance: none;
-            width: 28px; /* Más grande para ver bien en móvil */
+            width: 28px;
             height: 28px;
             border: 2px solid #e0e0e0;
             border-radius: 6px;
@@ -240,39 +294,6 @@
             color: #555;
         }
 
-        /* --- PREGUNTA CONDICIONAL --- */
-        .question-box {
-            background: #f9f9f9;
-            padding: 12px 15px;
-            border-radius: 8px;
-            border: 1px solid var(--border-color);
-            display: flex;
-            align-items: center;
-            gap: 15px;
-            margin-bottom: 20px;
-            margin-top: 20px;
-            width: fit-content; /* Para que no ocupe todo el ancho si no es necesario */
-        }
-
-        .question-box label {
-            font-weight: 500;
-            font-size: 14px;
-        }
-
-        .radio-group {
-            display: flex;
-            gap: 15px;
-        }
-
-        .radio-group label {
-            font-weight: 400;
-            font-size: 14px;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            gap: 5px;
-        }
-
         #servicios-section {
             display: none;
         }
@@ -282,13 +303,21 @@
 
 <div class="container">
     
-    <!-- CONTROLES SUPERIORES (Código obligatorio y descarga) -->
+    <!-- 1. CÓDIGO OBLIGATORIO Y DESCARGA -->
     <div class="top-controls">
-        <h1>Distribución y Dependencias</h1>
+        <h1>Registro de Inmueble</h1>
         <div class="export-group">
-            <!-- El asterisco indica que es obligatorio -->
             <input type="text" id="codigoInput" class="code-input" placeholder="CÓDIGO OBLIGATORIO * (EJ: ENE120102)" required>
             <button class="btn-primary" onclick="descargarExcel()">Descargar Excel</button>
+        </div>
+    </div>
+
+    <!-- 2. SELECCIÓN DE TIPO DE INMUEBLE -->
+    <div class="question-box" style="border-color: var(--primary-color); background: #fff5f5;">
+        <label>Tipo de Inmueble:</label>
+        <div class="radio-group">
+            <label><input type="radio" name="tipoInmueble" value="residencial" checked> Residencial</label>
+            <label><input type="radio" name="tipoInmueble" value="comercial"> Comercial</label>
         </div>
     </div>
     
@@ -307,7 +336,7 @@
     </div>
     
     <div class="actions">
-        <button class="btn-action" onclick="agregarFila()">+ Añadir Dependencia</button>
+        <button class="btn-action" onclick="agregarFila()">+ Añadir Fila</button>
         <button class="btn-action" onclick="agregarColumna()">+ Añadir Piso</button>
     </div>
 
@@ -343,12 +372,23 @@
 </div>
 
 <script>
-    const dependenciasIniciales = [
+    // --- BASES DE DATOS DE DEPENDENCIAS ---
+    const dependenciasResidenciales = [
         "Hall acceso", "Sala", "Comedor", "Cocina", "Zona de ropas", 
         "Patio", "Antejardín", "Balcón", "Garaje cubierto", "Garaje descubierto", 
         "Cuarto util", "Deposito", "Alcoba de servicio", "Baño de servicio", 
         "Hall alcobas", "Alcobas", "Baño alcobas", "Baño social", "Star tv", 
         "Estudio", "Bodega"
+    ];
+
+    const dependenciasComerciales = [
+        "Oficina", "Bodega", "Consultorio", "Local", "Auditorio", "Recepción",
+        "Sala de espera", "Hall", "Correspondencia", "Espacio de oficinas",
+        "Oficina privada", "Oficina de presidencia / gerencia", "Sala de juntas",
+        "Archivo", "Cocineta", "Cafetería", "Baños sociales", "Baño privado",
+        "Baño de servicio", "Área de servicios", "Cuarto técnico",
+        "Cuarto técnico de mecánica", "Cuarto de máquinas",
+        "Cuarto de máquinas de ascensores", "Tanques de agua", "Terraza", "Balcón"
     ];
 
     const serviciosIniciales = [
@@ -361,8 +401,11 @@
         "PARQUEADERO VISITANTES", "PARQUEADERO COMÚN RESIDENTES"
     ];
 
+    // --- VARIABLES DE ESTADO ---
     let numPisos = 5; 
+    let currentDependencias = dependenciasResidenciales; // Por defecto residencial
 
+    // --- FUNCIONES DE CREACIÓN DE ELEMENTOS ---
     function crearInputNumero() {
         const input = document.createElement('input');
         input.type = 'text';
@@ -381,27 +424,32 @@
         return wrapper;
     }
 
-    function inicializarTabla() {
+    // --- RENDERIZADO DE LA TABLA DE DEPENDENCIAS ---
+    function renderizarTablaDependencias() {
         const headerRow = document.getElementById('dependencias-header');
         const tbody = document.getElementById('dependencias-body');
-        
+
+        // Limpiar tabla existente
+        headerRow.innerHTML = '<th>Dependencia / Pisos</th>';
+        tbody.innerHTML = '';
+
+        // Crear encabezados de pisos con botón de eliminar
         for (let i = 1; i <= numPisos; i++) {
             const th = document.createElement('th');
-            th.textContent = i;
+            th.innerHTML = `${i} <button class="btn-del-col" onclick="eliminarColumna(this)">×</button>`;
             headerRow.appendChild(th);
         }
 
-        dependenciasIniciales.forEach(dep => {
+        // Crear filas de dependencias
+        currentDependencias.forEach(dep => {
             const tr = document.createElement('tr');
             
+            // Columna de nombre con botón de eliminar
             const tdNombre = document.createElement('td');
-            const inputNombre = document.createElement('input');
-            inputNombre.type = 'text';
-            inputNombre.value = dep;
-            inputNombre.className = 'editable-text';
-            tdNombre.appendChild(inputNombre);
+            tdNombre.innerHTML = `<input type="text" value="${dep}" class="editable-text"> <button class="btn-del-row" onclick="eliminarFila(this)">×</button>`;
             tr.appendChild(tdNombre);
 
+            // Columnas de inputs numéricos
             for (let i = 1; i <= numPisos; i++) {
                 const td = document.createElement('td');
                 td.appendChild(crearInputNumero());
@@ -412,6 +460,8 @@
     }
 
     function inicializarServicios() {
+        const tbody = document.getElementById('servicios-body');
+        tbody.innerHTML = '';
         serviciosIniciales.forEach(serv => {
             agregarFilaServicio(serv);
         });
@@ -437,20 +487,19 @@
         tbody.appendChild(tr);
     }
 
+    // --- FUNCIONES DE AGREGAR ---
     function agregarFila() {
         const tbody = document.getElementById('dependencias-body');
+        const headerRow = document.getElementById('dependencias-header');
+        const totalColumnas = headerRow.children.length - 1;
+        
         const tr = document.createElement('tr');
         
         const tdNombre = document.createElement('td');
-        const inputNombre = document.createElement('input');
-        inputNombre.type = 'text';
-        inputNombre.placeholder = 'Nueva dependencia';
-        inputNombre.className = 'editable-text';
-        tdNombre.appendChild(inputNombre);
+        tdNombre.innerHTML = `<input type="text" placeholder="Nueva dependencia" class="editable-text"> <button class="btn-del-row" onclick="eliminarFila(this)">×</button>`;
         tr.appendChild(tdNombre);
 
-        const totalColumnas = document.getElementById('dependencias-header').children.length - 1;
-        for (let i = 1; i <= totalColumnas; i++) {
+        for (let i = 0; i < totalColumnas; i++) {
             const td = document.createElement('td');
             td.appendChild(crearInputNumero());
             tr.appendChild(td);
@@ -459,26 +508,76 @@
     }
 
     function agregarColumna() {
-        numPisos++;
         const headerRow = document.getElementById('dependencias-header');
         const tbody = document.getElementById('dependencias-body');
+        const newColNum = headerRow.children.length; // El número de columnas actuales + 1
 
+        // Agregar encabezado con botón de eliminar
         const th = document.createElement('th');
-        th.textContent = numPisos;
+        th.innerHTML = `${newColNum} <button class="btn-del-col" onclick="eliminarColumna(this)">×</button>`;
         headerRow.appendChild(th);
 
+        // Agregar celda a cada fila
         const filas = tbody.querySelectorAll('tr');
         filas.forEach(tr => {
             const td = document.createElement('td');
             td.appendChild(crearInputNumero());
             tr.appendChild(td);
         });
+        numPisos++;
     }
 
     function agregarServicio() {
         agregarFilaServicio();
     }
 
+    // --- FUNCIONES DE ELIMINAR ---
+    function eliminarFila(btn) {
+        if (confirm("¿Estás seguro de que quieres eliminar esta fila?")) {
+            btn.closest('tr').remove();
+        }
+    }
+
+    function eliminarColumna(btn) {
+        if (confirm("¿Estás seguro de que quieres eliminar este piso/columna?")) {
+            const th = btn.parentElement;
+            const index = Array.from(th.parentElement.children).indexOf(th);
+            
+            // Eliminar encabezado
+            th.remove();
+            
+            // Eliminar celdas de todas las filas
+            const rows = document.querySelectorAll('#dependencias-body tr');
+            rows.forEach(row => {
+                if (row.cells[index]) {
+                    row.deleteCell(index);
+                }
+            });
+            
+            numPisos--;
+            
+            // Renumerar encabezados restantes
+            const remainingThs = document.querySelectorAll('#dependencias-header th');
+            for (let i = 1; i < remainingThs.length; i++) {
+                remainingThs[i].innerHTML = `${i} <button class="btn-del-col" onclick="eliminarColumna(this)">×</button>`;
+            }
+        }
+    }
+
+    // --- LÓGICA DE TIPO DE INMUEBLE ---
+    document.querySelectorAll('input[name="tipoInmueble"]').forEach(radio => {
+        radio.addEventListener('change', (e) => {
+            if (e.target.value === 'residencial') {
+                currentDependencias = dependenciasResidenciales;
+            } else {
+                currentDependencias = dependenciasComerciales;
+            }
+            numPisos = 5; // Reiniciar a 5 pisos por defecto al cambiar
+            renderizarTablaDependencias();
+        });
+    });
+
+    // --- LÓGICA DE SERVICIOS COMUNALES ---
     document.querySelectorAll('input[name="tieneServicios"]').forEach(radio => {
         radio.addEventListener('change', (e) => {
             const seccionServicios = document.getElementById('servicios-section');
@@ -490,12 +589,12 @@
         });
     });
 
+    // --- EXPORTACIÓN A EXCEL ---
     function descargarExcel() {
         const codigoInput = document.getElementById('codigoInput');
         const codigo = codigoInput.value.trim().toUpperCase();
         const regexCodigo = /^[A-Z]{3}\d{6}$/;
 
-        // VALIDACIÓN OBLIGATORIA
         if (codigo === '') {
             alert("⚠️ El campo 'CÓDIGO' es obligatorio para poder descargar el Excel.");
             codigoInput.focus();
@@ -510,17 +609,27 @@
 
         const wb = XLSX.utils.book_new();
 
-        // Hoja 1: Dependencias
+        // --- Hoja 1: Dependencias ---
         const datosDependencias = [];
         const headersDep = [];
         
-        document.querySelectorAll('#dependencias-header th').forEach(th => headersDep.push(th.textContent));
+        // Extraer encabezados (Ignorando el botón de eliminar)
+        document.querySelectorAll('#dependencias-header th').forEach((th, index) => {
+            if (index === 0) {
+                headersDep.push("Dependencia / Pisos");
+            } else {
+                headersDep.push(th.childNodes[0].textContent.trim());
+            }
+        });
         datosDependencias.push(headersDep);
 
+        // Extraer filas
         document.querySelectorAll('#dependencias-body tr').forEach(tr => {
             const filaData = [];
+            // Extraer el nombre de la dependencia (primer input de texto)
             filaData.push(tr.querySelector('input[type="text"]').value);
             
+            // Extraer los valores de los inputs numéricos
             tr.querySelectorAll('.cell-number-input').forEach(input => {
                 filaData.push(input.value);
             });
@@ -530,7 +639,7 @@
         const wsDep = XLSX.utils.aoa_to_sheet(datosDependencias);
         XLSX.utils.book_append_sheet(wb, wsDep, "Dependencias");
 
-        // Hoja 2: Servicios Comunales
+        // --- Hoja 2: Servicios Comunales ---
         const tieneServicios = document.querySelector('input[name="tieneServicios"]:checked').value === 'si';
         
         if (tieneServicios) {
@@ -548,8 +657,9 @@
         XLSX.writeFile(wb, `Registro_Inmueble_${codigo}.xlsx`);
     }
 
+    // --- INICIALIZACIÓN ---
     window.onload = function() {
-        inicializarTabla();
+        renderizarTablaDependencias();
         inicializarServicios();
     };
 </script>
