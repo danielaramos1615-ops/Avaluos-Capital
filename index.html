@@ -116,16 +116,16 @@
         }
 
         #servicios-table {
-            width: 100%; /* Forzar a que ocupe el ancho disponible */
+            width: 100%;
         }
 
         th, td {
-            padding: 8px 4px; /* Un poquito más de padding vertical para que respire */
+            padding: 8px 4px;
             text-align: center;
             vertical-align: middle;
             border-bottom: 1px solid var(--border-color);
-            white-space: normal; /* ¡AQUÍ ESTÁ LA MAGIA! Permitir saltos de línea */
-            word-break: break-word; /* Evita que palabras muy largas desborden */
+            white-space: normal;
+            word-break: break-word;
         }
 
         th {
@@ -136,12 +136,11 @@
             user-select: none;
         }
 
-        /* Ajuste específico para la primera columna (Nombres) */
         th:first-child, td:first-child {
             text-align: left;
             padding-left: 10px;
-            width: auto; /* Dejar que el navegador calcule el ancho */
-            min-width: 150px; /* Ancho mínimo para que se vea el nombre */
+            width: auto;
+            min-width: 150px;
         }
         
         td:first-child {
@@ -155,7 +154,7 @@
             border-bottom: none;
         }
 
-        /* Input de texto editable */
+        /* Input de texto editable (AHORA FORZADO A MAYÚSCULAS VISUALMENTE) */
         input[type="text"].editable-text {
             border: none;
             background: transparent;
@@ -163,10 +162,11 @@
             font-size: 13px;
             color: var(--text-main);
             width: 100%;
-            min-width: 100px; /* Reducido un poco para que no empuje tanto */
+            min-width: 100px;
             padding: 4px;
             border-radius: 4px;
             user-select: auto;
+            text-transform: uppercase; /* Fuerza visualmente a mayúsculas */
         }
 
         input[type="text"].editable-text:focus {
@@ -187,7 +187,7 @@
             background: #fff;
             margin: 0 auto;
             display: block;
-            white-space: nowrap; /* Los números no deben saltar de línea */
+            white-space: nowrap;
         }
 
         .cell-number-input:focus {
@@ -402,22 +402,23 @@
 </div>
 
 <script>
+    // --- BASES DE DATOS DE DEPENDENCIAS (AHORA EN MAYÚSCULAS) ---
     const dependenciasResidenciales = [
-        "Hall acceso", "Sala", "Comedor", "Cocina", "Zona de ropas", 
-        "Patio", "Antejardín", "Balcón", "Garaje cubierto", "Garaje descubierto", 
-        "Cuarto util", "Deposito", "Alcoba de servicio", "Baño de servicio", 
-        "Hall alcobas", "Alcobas", "Baño alcobas", "Baño social", "Star tv", 
-        "Estudio", "Bodega"
+        "HALL ACCESO", "SALA", "COMEDOR", "COCINA", "ZONA DE ROPAS", 
+        "PATIO", "ANTEJARDÍN", "BALCÓN", "GARAJE CUBIERTO", "GARAJE DESCUBIERTO", 
+        "CUARTO UTIL", "DEPOSITO", "ALCOBA DE SERVICIO", "BAÑO DE SERVICIO", 
+        "HALL ALCOBAS", "ALCOBAS", "BAÑO ALCOBAS", "BAÑO SOCIAL", "STAR TV", 
+        "ESTUDIO", "BODEGA"
     ];
 
     const dependenciasComerciales = [
-        "Oficina", "Bodega", "Consultorio", "Local", "Auditorio", "Recepción",
-        "Sala de espera", "Hall", "Correspondencia", "Espacio de oficinas",
-        "Oficina privada", "Oficina de presidencia / gerencia", "Sala de juntas",
-        "Archivo", "Cocineta", "Cafetería", "Baños sociales", "Baño privado",
-        "Baño de servicio", "Área de servicios", "Cuarto técnico",
-        "Cuarto técnico de mecánica", "Cuarto de máquinas",
-        "Cuarto de máquinas de ascensores", "Tanques de agua", "Terraza", "Balcón"
+        "OFICINA", "BODEGA", "CONSULTORIO", "LOCAL", "AUDITORIO", "RECEPCIÓN",
+        "SALA DE ESPERA", "HALL", "CORRESPONDENCIA", "ESPACIO DE OFICINAS",
+        "OFICINA PRIVADA", "OFICINA DE PRESIDENCIA / GERENCIA", "SALA DE JUNTAS",
+        "ARCHIVO", "COCINETA", "CAFETERÍA", "BAÑOS SOCIALES", "BAÑO PRIVADO",
+        "BAÑO DE SERVICIO", "ÁREA DE SERVICIOS", "CUARTO TÉCNICO",
+        "CUARTO TÉCNICO DE MECÁNICA", "CUARTO DE MÁQUINAS",
+        "CUARTO DE MÁQUINAS DE ASCENSORES", "TANQUES DE AGUA", "TERRAZA", "BALCÓN"
     ];
 
     const serviciosIniciales = [
@@ -430,9 +431,11 @@
         "PARQUEADERO VISITANTES", "PARQUEADERO COMÚN RESIDENTES"
     ];
 
+    // --- VARIABLES DE ESTADO ---
     let numPisos = 5; 
     let currentDependencias = dependenciasResidenciales; 
 
+    // --- FUNCIONES DE CREACIÓN ---
     function crearInputNumero() {
         const input = document.createElement('input');
         input.type = 'text';
@@ -451,6 +454,7 @@
         return wrapper;
     }
 
+    // --- RENDERIZADO DE LA TABLA ---
     function renderizarTablaDependencias() {
         const headerRow = document.getElementById('dependencias-header');
         const tbody = document.getElementById('dependencias-body');
@@ -468,7 +472,8 @@
             const tr = document.createElement('tr');
             
             const tdNombre = document.createElement('td');
-            tdNombre.innerHTML = `<input type="text" value="${dep}" class="editable-text"> <button class="btn-del" onclick="eliminarFila(this)">×</button>`;
+            // Convertir el valor a mayúsculas al renderizar
+            tdNombre.innerHTML = `<input type="text" value="${dep.toUpperCase()}" class="editable-text"> <button class="btn-del" onclick="eliminarFila(this)">×</button>`;
             tr.appendChild(tdNombre);
 
             for (let i = 1; i <= numPisos; i++) {
@@ -495,8 +500,9 @@
         const tdNombre = document.createElement('td');
         const inputNombre = document.createElement('input');
         inputNombre.type = 'text';
-        inputNombre.value = nombre;
-        inputNombre.placeholder = "Nombre del servicio";
+        // Convertir a mayúsculas al crear el input
+        inputNombre.value = nombre.toUpperCase(); 
+        inputNombre.placeholder = "NOMBRE DEL SERVICIO";
         inputNombre.className = 'editable-text';
         tdNombre.appendChild(inputNombre);
         
@@ -508,6 +514,7 @@
         tbody.appendChild(tr);
     }
 
+    // --- FUNCIONES DE AGREGAR ---
     function agregarFila() {
         const tbody = document.getElementById('dependencias-body');
         const headerRow = document.getElementById('dependencias-header');
@@ -516,7 +523,7 @@
         const tr = document.createElement('tr');
         
         const tdNombre = document.createElement('td');
-        tdNombre.innerHTML = `<input type="text" placeholder="Nueva dependencia" class="editable-text"> <button class="btn-del" onclick="eliminarFila(this)">×</button>`;
+        tdNombre.innerHTML = `<input type="text" placeholder="NUEVA DEPENDENCIA" class="editable-text"> <button class="btn-del" onclick="eliminarFila(this)">×</button>`;
         tr.appendChild(tdNombre);
 
         for (let i = 0; i < totalColumnas; i++) {
@@ -549,6 +556,7 @@
         agregarFilaServicio();
     }
 
+    // --- FUNCIONES DE ELIMINAR ---
     function eliminarFila(btn) {
         if (confirm("¿Estás seguro de que quieres eliminar esta fila?")) {
             btn.closest('tr').remove();
@@ -580,6 +588,7 @@
         }
     }
 
+    // --- LÓGICA DE "MANTENER PRESIONADO" (LONG PRESS) ---
     let pressTimer;
     const DELAY = 500; 
 
@@ -620,6 +629,7 @@
         }
     });
 
+    // --- LÓGICA DE TIPO DE INMUEBLE ---
     document.querySelectorAll('input[name="tipoInmueble"]').forEach(radio => {
         radio.addEventListener('change', (e) => {
             if (e.target.value === 'residencial') {
@@ -632,6 +642,7 @@
         });
     });
 
+    // --- LÓGICA DE SERVICIOS COMUNALES ---
     document.querySelectorAll('input[name="tieneServicios"]').forEach(radio => {
         radio.addEventListener('change', (e) => {
             const seccionServicios = document.getElementById('servicios-section');
@@ -643,6 +654,22 @@
         });
     });
 
+    // --- LÓGICA PARA FORZAR MAYÚSCULAS EN TIEMPO REAL ---
+    document.addEventListener('input', function(e) {
+        if (e.target.classList.contains('editable-text')) {
+            // Guarda la posición del cursor
+            const start = e.target.selectionStart;
+            const end = e.target.selectionEnd;
+            
+            // Convierte a mayúsculas
+            e.target.value = e.target.value.toUpperCase();
+            
+            // Restaura la posición del cursor para que no salte al final
+            e.target.setSelectionRange(start, end);
+        }
+    });
+
+    // --- EXPORTACIÓN A EXCEL ---
     function descargarExcel() {
         const codigoInput = document.getElementById('codigoInput');
         const codigo = codigoInput.value.trim().toUpperCase();
@@ -704,6 +731,7 @@
         XLSX.writeFile(wb, `Registro_Inmueble_${codigo}.xlsx`);
     }
 
+    // --- INICIALIZACIÓN ---
     window.onload = function() {
         renderizarTablaDependencias();
         inicializarServicios();
