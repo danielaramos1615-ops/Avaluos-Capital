@@ -106,16 +106,21 @@
             border-color: #ccc;
         }
 
-        /* ¡AQUÍ ESTÁ EL BOTÓN ROJO! */
+        /* Estilo del botón de eliminar (Rosa suave como te gustaba) */
         .btn-danger {
-            color: #ffffff;
-            border: 1px solid #dc3545;
-            background: #dc3545;
+            color: #d9534f;
+            border-color: #d9534f;
+            background: #fff5f5;
         }
 
         .btn-danger:hover {
-            background: #c82333;
-            border-color: #bd2130;
+            background: #d9534f;
+            color: white;
+        }
+
+        /* Clase para ocultar el botón por defecto */
+        .hidden-btn {
+            display: none !important;
         }
 
         /* --- DISEÑO DE LA TABLA --- */
@@ -139,7 +144,6 @@
             border-bottom: 1px solid var(--border-color);
             white-space: normal;
             word-break: break-word;
-            /* Evitar selección de texto al mantener presionado */
             -webkit-user-select: none;
             -ms-user-select: none;
             user-select: none;
@@ -169,7 +173,6 @@
             border-bottom: none;
         }
 
-        /* Modo Selección: Resalta las filas cuando está activo */
         .selection-mode tr {
             background-color: #fafafa;
         }
@@ -186,7 +189,6 @@
             padding: 4px;
             border-radius: 4px;
             text-transform: uppercase;
-            /* Permitir selección de texto SOLO dentro del input */
             -webkit-user-select: auto;
             -ms-user-select: auto;
             user-select: auto;
@@ -228,7 +230,7 @@
             border-radius: 4px;
             background-color: #fff;
             cursor: pointer;
-            display: none; /* Ocultos por defecto */
+            display: none;
             align-items: center;
             justify-content: center;
             flex-shrink: 0;
@@ -236,7 +238,6 @@
             transition: all 0.2s;
         }
 
-        /* Mostrar checkboxes cuando la tabla tenga la clase selection-mode */
         .selection-mode .row-selector {
             display: inline-flex;
         }
@@ -414,7 +415,8 @@
     <div class="actions-top">
         <button class="btn-action" onclick="agregarFila()">+ Añadir Fila</button>
         <button class="btn-action" onclick="agregarColumna()">+ Añadir Piso</button>
-        <button class="btn-action btn-danger" onclick="prepararEliminacionDependencias()">🗑️ Eliminar Seleccionadas</button>
+        <!-- Botón de eliminar oculto por defecto -->
+        <button class="btn-action btn-danger hidden-btn" id="btn-eliminar-dep" onclick="prepararEliminacionDependencias()">🗑️ Eliminar Seleccionadas</button>
     </div>
     
     <!-- TABLA DEPENDENCIAS -->
@@ -465,7 +467,8 @@
         </div>
         <div class="actions-top">
             <button class="btn-action" onclick="agregarServicio()">+ Añadir Servicio</button>
-            <button class="btn-action btn-danger" onclick="prepararEliminacionServicios()">🗑️ Eliminar Seleccionados</button>
+            <!-- Botón de eliminar oculto por defecto -->
+            <button class="btn-action btn-danger hidden-btn" id="btn-eliminar-serv" onclick="prepararEliminacionServicios()">🗑️ Eliminar Seleccionados</button>
         </div>
     </div>
 
@@ -644,27 +647,46 @@
         agregarFilaServicio();
     }
 
+    // --- FUNCIÓN PARA MOSTRAR U OCULTAR EL BOTÓN DE ELIMINAR ---
+    function actualizarVisibilidadBotones(tipo) {
+        if (tipo === 'dep') {
+            const btn = document.getElementById('btn-eliminar-dep');
+            const tbody = document.getElementById('dependencias-body');
+            const checkboxes = tbody.querySelectorAll('.row-dep-check:checked');
+            
+            // Mostrar si el modo selección está activo O si hay checkboxes marcados
+            if (tbody.classList.contains('selection-mode') || checkboxes.length > 0) {
+                btn.classList.remove('hidden-btn');
+            } else {
+                btn.classList.add('hidden-btn');
+            }
+        } else if (tipo === 'serv') {
+            const btn = document.getElementById('btn-eliminar-serv');
+            const tbody = document.getElementById('servicios-body');
+            const checkboxes = tbody.querySelectorAll('.row-serv-check:checked');
+            
+            if (tbody.classList.contains('selection-mode') || checkboxes.length > 0) {
+                btn.classList.remove('hidden-btn');
+            } else {
+                btn.classList.add('hidden-btn');
+            }
+        }
+    }
+
     // --- FUNCIONES DE SELECCIÓN Y ELIMINACIÓN MASIVA ---
     function toggleSelectAllDep(source) {
         const checkboxes = document.querySelectorAll('.row-dep-check');
         checkboxes.forEach(cb => cb.checked = source.checked);
+        actualizarVisibilidadBotones('dep');
     }
 
     function toggleSelectAllServ(source) {
         const checkboxes = document.querySelectorAll('.row-serv-check');
         checkboxes.forEach(cb => cb.checked = source.checked);
+        actualizarVisibilidadBotones('serv');
     }
 
-    // NUEVA FUNCIÓN: Verifica si el modo selección está activo antes de eliminar
     function prepararEliminacionDependencias() {
-        const tbody = document.getElementById('dependencias-body');
-        if (!tbody.classList.contains('selection-mode')) {
-            if (confirm("Para eliminar, primero debes seleccionar las filas.\n\n¿Quieres activar el modo de selección ahora?")) {
-                tbody.classList.add('selection-mode');
-            }
-            return;
-        }
-        
         const seleccionadas = document.querySelectorAll('.row-dep-check:checked');
         if (seleccionadas.length === 0) {
             alert("No has marcado ninguna dependencia para eliminar.");
@@ -673,19 +695,12 @@
         if (confirm(`¿Estás seguro de que quieres eliminar ${seleccionadas.length} dependencia(s)?`)) {
             seleccionadas.forEach(cb => cb.closest('tr').remove());
             document.getElementById('select-all-dep').checked = false;
-            tbody.classList.remove('selection-mode');
+            document.getElementById('dependencias-body').classList.remove('selection-mode');
+            actualizarVisibilidadBotones('dep');
         }
     }
 
     function prepararEliminacionServicios() {
-        const tbody = document.getElementById('servicios-body');
-        if (!tbody.classList.contains('selection-mode')) {
-            if (confirm("Para eliminar, primero debes seleccionar las filas.\n\n¿Quieres activar el modo de selección ahora?")) {
-                tbody.classList.add('selection-mode');
-            }
-            return;
-        }
-
         const seleccionadas = document.querySelectorAll('.row-serv-check:checked');
         if (seleccionadas.length === 0) {
             alert("No has marcado ningún servicio para eliminar.");
@@ -694,7 +709,8 @@
         if (confirm(`¿Estás seguro de que quieres eliminar ${seleccionadas.length} servicio(s)?`)) {
             seleccionadas.forEach(cb => cb.closest('tr').remove());
             document.getElementById('select-all-serv').checked = false;
-            tbody.classList.remove('selection-mode');
+            document.getElementById('servicios-body').classList.remove('selection-mode');
+            actualizarVisibilidadBotones('serv');
         }
     }
 
@@ -729,7 +745,6 @@
 
     function iniciarPresion(e, tipo) {
         if (e.type === 'mousedown' && e.button !== 0) return;
-        // Si hace clic en un checkbox o en un botón, no activar long press
         if (e.target.classList.contains('row-selector') || e.target.tagName === 'BUTTON') return;
 
         if (tipo === 'columna') {
@@ -743,14 +758,17 @@
                 }
             }, DELAY);
         } else if (tipo === 'fila') {
-            const contenedor = e.target.closest('tr'); // Detectar presión en cualquier parte de la fila
+            const contenedor = e.target.closest('tr');
             if (!contenedor) return;
             const tbody = contenedor.closest('tbody');
             pressTimer = setTimeout(() => {
+                // Desactivar modo selección en la otra tabla si está activo
                 document.querySelectorAll('tbody').forEach(tb => {
                     if (tb !== tbody) tb.classList.remove('selection-mode');
                 });
                 tbody.classList.add('selection-mode');
+                // Mostrar el botón correspondiente
+                actualizarVisibilidadBotones(tbody.id === 'dependencias-body' ? 'dep' : 'serv');
             }, DELAY);
         }
     }
@@ -759,7 +777,7 @@
         clearTimeout(pressTimer);
     }
 
-    // Prevenir el menú de copiar/pegar nativo en las tablas para que no interrumpa el long press
+    // Prevenir menú de copiar/pegar en las tablas
     document.addEventListener('contextmenu', function(e) {
         if (e.target.closest('td') || e.target.closest('th')) {
             e.preventDefault();
@@ -773,19 +791,39 @@
     const tbodyDep = document.getElementById('dependencias-body');
     tbodyDep.addEventListener('mousedown', (e) => iniciarPresion(e, 'fila'));
     tbodyDep.addEventListener('touchstart', (e) => iniciarPresion(e, 'fila'), {passive: true});
+    // Escuchar cambios en los checkboxes para mostrar/ocultar el botón
+    tbodyDep.addEventListener('change', (e) => {
+        if (e.target.classList.contains('row-selector')) {
+            actualizarVisibilidadBotones('dep');
+        }
+    });
 
     const tbodyServ = document.getElementById('servicios-body');
     tbodyServ.addEventListener('mousedown', (e) => iniciarPresion(e, 'fila'));
     tbodyServ.addEventListener('touchstart', (e) => iniciarPresion(e, 'fila'), {passive: true});
+    // Escuchar cambios en los checkboxes para mostrar/ocultar el botón
+    tbodyServ.addEventListener('change', (e) => {
+        if (e.target.classList.contains('row-selector')) {
+            actualizarVisibilidadBotones('serv');
+        }
+    });
 
     document.addEventListener('mouseup', cancelarPresion);
     document.addEventListener('touchend', cancelarPresion);
-    document.addEventListener('touchmove', cancelarPresion); // Cancelar si el usuario desliza (scroll)
+    document.addEventListener('touchmove', cancelarPresion);
     document.addEventListener('touchcancel', cancelarPresion);
 
+    // Click fuera de las tablas oculta el modo selección y los botones
     document.addEventListener('click', (e) => {
-        if (!e.target.classList.contains('btn-del-col') && !e.target.classList.contains('btn-danger')) {
+        if (!e.target.classList.contains('btn-del-col')) {
             document.querySelectorAll('.show-delete').forEach(el => el.classList.remove('show-delete'));
+        }
+        
+        // Si hace clic fuera de una tabla y NO es un botón de eliminar, quitar modo selección
+        if (!e.target.closest('table') && !e.target.closest('.btn-danger')) {
+            document.querySelectorAll('.selection-mode').forEach(el => el.classList.remove('selection-mode'));
+            actualizarVisibilidadBotones('dep');
+            actualizarVisibilidadBotones('serv');
         }
     });
 
@@ -799,6 +837,7 @@
             }
             numPisos = 5; 
             renderizarTablaDependencias();
+            actualizarVisibilidadBotones('dep'); // Reiniciar botón
         });
     });
 
@@ -810,6 +849,7 @@
                 seccionServicios.style.display = 'block';
             } else {
                 seccionServicios.style.display = 'none';
+                actualizarVisibilidadBotones('serv'); // Reiniciar botón
             }
         });
     });
