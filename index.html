@@ -106,7 +106,7 @@
             border-color: #ccc;
         }
 
-        /* Estilo del botón de eliminar (Rosa suave como te gustaba) */
+        /* Estilo del botón de eliminar (Rosa suave) */
         .btn-danger {
             color: #d9534f;
             border-color: #d9534f;
@@ -230,7 +230,7 @@
             border-radius: 4px;
             background-color: #fff;
             cursor: pointer;
-            display: none;
+            display: none; /* Ocultos por defecto */
             align-items: center;
             justify-content: center;
             flex-shrink: 0;
@@ -238,6 +238,7 @@
             transition: all 0.2s;
         }
 
+        /* Mostrar checkboxes cuando la tabla tenga la clase selection-mode */
         .selection-mode .row-selector {
             display: inline-flex;
         }
@@ -415,8 +416,8 @@
     <div class="actions-top">
         <button class="btn-action" onclick="agregarFila()">+ Añadir Fila</button>
         <button class="btn-action" onclick="agregarColumna()">+ Añadir Piso</button>
-        <!-- Botón de eliminar oculto por defecto -->
-        <button class="btn-action btn-danger hidden-btn" id="btn-eliminar-dep" onclick="prepararEliminacionDependencias()">🗑️ Eliminar Seleccionadas</button>
+        <!-- Botón de eliminar oculto por defecto (SIN EMOJI) -->
+        <button class="btn-action btn-danger hidden-btn" id="btn-eliminar-dep" onclick="prepararEliminacionDependencias()">Eliminar Seleccionadas</button>
     </div>
     
     <!-- TABLA DEPENDENCIAS -->
@@ -426,7 +427,8 @@
                 <tr id="dependencias-header">
                     <th>
                         <div style="display:flex; align-items:center; gap:5px;">
-                            <input type="checkbox" class="row-selector" id="select-all-dep" onclick="toggleSelectAllDep(this)">
+                            <!-- Checkbox de Seleccionar Todo -->
+                            <input type="checkbox" class="row-selector" id="select-all-dep" onclick="toggleSelectAllDep(this)" title="Seleccionar Todo">
                             <span>Dependencia / Pisos</span>
                         </div>
                     </th>
@@ -454,7 +456,8 @@
                     <tr>
                         <th>
                             <div style="display:flex; align-items:center; gap:5px;">
-                                <input type="checkbox" class="row-selector" id="select-all-serv" onclick="toggleSelectAllServ(this)">
+                                <!-- Checkbox de Seleccionar Todo -->
+                                <input type="checkbox" class="row-selector" id="select-all-serv" onclick="toggleSelectAllServ(this)" title="Seleccionar Todo">
                                 <span>Servicio</span>
                             </div>
                         </th>
@@ -467,8 +470,8 @@
         </div>
         <div class="actions-top">
             <button class="btn-action" onclick="agregarServicio()">+ Añadir Servicio</button>
-            <!-- Botón de eliminar oculto por defecto -->
-            <button class="btn-action btn-danger hidden-btn" id="btn-eliminar-serv" onclick="prepararEliminacionServicios()">🗑️ Eliminar Seleccionados</button>
+            <!-- Botón de eliminar oculto por defecto (SIN EMOJI) -->
+            <button class="btn-action btn-danger hidden-btn" id="btn-eliminar-serv" onclick="prepararEliminacionServicios()">Eliminar Seleccionados</button>
         </div>
     </div>
 
@@ -545,7 +548,7 @@
         headerRow.innerHTML = `
             <th>
                 <div style="display:flex; align-items:center; gap:5px;">
-                    <input type="checkbox" class="row-selector" id="select-all-dep" onclick="toggleSelectAllDep(this)">
+                    <input type="checkbox" class="row-selector" id="select-all-dep" onclick="toggleSelectAllDep(this)" title="Seleccionar Todo">
                     <span>Dependencia / Pisos</span>
                 </div>
             </th>`;
@@ -654,7 +657,6 @@
             const tbody = document.getElementById('dependencias-body');
             const checkboxes = tbody.querySelectorAll('.row-dep-check:checked');
             
-            // Mostrar si el modo selección está activo O si hay checkboxes marcados
             if (tbody.classList.contains('selection-mode') || checkboxes.length > 0) {
                 btn.classList.remove('hidden-btn');
             } else {
@@ -762,12 +764,10 @@
             if (!contenedor) return;
             const tbody = contenedor.closest('tbody');
             pressTimer = setTimeout(() => {
-                // Desactivar modo selección en la otra tabla si está activo
                 document.querySelectorAll('tbody').forEach(tb => {
                     if (tb !== tbody) tb.classList.remove('selection-mode');
                 });
                 tbody.classList.add('selection-mode');
-                // Mostrar el botón correspondiente
                 actualizarVisibilidadBotones(tbody.id === 'dependencias-body' ? 'dep' : 'serv');
             }, DELAY);
         }
@@ -791,7 +791,6 @@
     const tbodyDep = document.getElementById('dependencias-body');
     tbodyDep.addEventListener('mousedown', (e) => iniciarPresion(e, 'fila'));
     tbodyDep.addEventListener('touchstart', (e) => iniciarPresion(e, 'fila'), {passive: true});
-    // Escuchar cambios en los checkboxes para mostrar/ocultar el botón
     tbodyDep.addEventListener('change', (e) => {
         if (e.target.classList.contains('row-selector')) {
             actualizarVisibilidadBotones('dep');
@@ -801,7 +800,6 @@
     const tbodyServ = document.getElementById('servicios-body');
     tbodyServ.addEventListener('mousedown', (e) => iniciarPresion(e, 'fila'));
     tbodyServ.addEventListener('touchstart', (e) => iniciarPresion(e, 'fila'), {passive: true});
-    // Escuchar cambios en los checkboxes para mostrar/ocultar el botón
     tbodyServ.addEventListener('change', (e) => {
         if (e.target.classList.contains('row-selector')) {
             actualizarVisibilidadBotones('serv');
@@ -813,13 +811,10 @@
     document.addEventListener('touchmove', cancelarPresion);
     document.addEventListener('touchcancel', cancelarPresion);
 
-    // Click fuera de las tablas oculta el modo selección y los botones
     document.addEventListener('click', (e) => {
         if (!e.target.classList.contains('btn-del-col')) {
             document.querySelectorAll('.show-delete').forEach(el => el.classList.remove('show-delete'));
         }
-        
-        // Si hace clic fuera de una tabla y NO es un botón de eliminar, quitar modo selección
         if (!e.target.closest('table') && !e.target.closest('.btn-danger')) {
             document.querySelectorAll('.selection-mode').forEach(el => el.classList.remove('selection-mode'));
             actualizarVisibilidadBotones('dep');
@@ -837,7 +832,7 @@
             }
             numPisos = 5; 
             renderizarTablaDependencias();
-            actualizarVisibilidadBotones('dep'); // Reiniciar botón
+            actualizarVisibilidadBotones('dep'); 
         });
     });
 
@@ -849,7 +844,7 @@
                 seccionServicios.style.display = 'block';
             } else {
                 seccionServicios.style.display = 'none';
-                actualizarVisibilidadBotones('serv'); // Reiniciar botón
+                actualizarVisibilidadBotones('serv'); 
             }
         });
     });
