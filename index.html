@@ -4,9 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Registro de Dependencias y Servicios</title>
-    <!-- Importar fuente moderna -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
-    <!-- Importar SheetJS para generar Excel -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     <style>
         :root {
@@ -21,7 +19,7 @@
             font-family: 'Inter', sans-serif;
             background-color: var(--bg-color);
             color: var(--text-main);
-            padding: 40px 20px;
+            padding: 20px 10px; /* Menos padding en móviles */
             margin: 0;
             display: flex;
             justify-content: center;
@@ -31,115 +29,79 @@
             width: 100%;
             max-width: 1000px;
             background: #ffffff;
-            padding: 40px;
+            padding: 20px;
             border-radius: 16px;
             box-shadow: 0 10px 40px rgba(0,0,0,0.04);
         }
 
         h1, h2 {
             font-weight: 600;
-            font-size: 22px;
+            font-size: 20px;
             margin-top: 0;
-            margin-bottom: 20px;
+            margin-bottom: 15px;
             color: var(--text-main);
         }
 
         h2 {
-            margin-top: 40px;
+            margin-top: 30px;
             font-size: 18px;
         }
 
         /* --- SECCIÓN SUPERIOR (CÓDIGO Y DESCARGA) --- */
         .top-controls {
             display: flex;
-            justify-content: space-between;
-            align-items: center;
-            flex-wrap: wrap;
+            flex-direction: column; /* En móvil se apilan */
             gap: 15px;
             margin-bottom: 20px;
-            padding-bottom: 20px;
+            padding-bottom: 15px;
             border-bottom: 1px solid var(--border-color);
         }
 
-        .top-controls h1 {
-            margin-bottom: 0;
+        @media (min-width: 600px) {
+            .top-controls {
+                flex-direction: row;
+                justify-content: space-between;
+                align-items: center;
+            }
+            .top-controls h1 { margin-bottom: 0; }
         }
 
         .export-group {
             display: flex;
-            gap: 10px;
+            gap: 8px;
             align-items: center;
+            width: 100%;
         }
 
         .code-input {
-            padding: 12px 16px;
-            font-size: 15px;
+            padding: 10px 12px;
+            font-size: 14px;
             font-family: 'Inter', sans-serif;
-            border: 2px solid #e0e0e0;
+            border: 2px solid var(--primary-color); /* Borde rojo para indicar obligatorio */
             border-radius: 8px;
-            width: 220px;
+            flex-grow: 1; /* Ocupa el espacio disponible */
             text-transform: uppercase;
-            transition: border 0.2s;
         }
 
         .code-input:focus {
             outline: none;
-            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(217, 115, 115, 0.2);
         }
 
         .btn-primary {
             background: var(--text-main);
             color: white;
             border: none;
-            padding: 12px 24px;
-            font-size: 15px;
+            padding: 10px 15px;
+            font-size: 14px;
             font-family: 'Inter', sans-serif;
             font-weight: 500;
             border-radius: 8px;
             cursor: pointer;
-            transition: background 0.2s;
+            white-space: nowrap;
         }
 
-        .btn-primary:hover {
-            background: #000;
-        }
-
-        /* --- PREGUNTA CONDICIONAL --- */
-        .question-box {
-            background: #f9f9f9;
-            padding: 15px 20px;
-            border-radius: 8px;
-            border: 1px solid var(--border-color);
-            display: flex;
-            align-items: center;
-            gap: 20px;
-            margin-bottom: 30px;
-        }
-
-        .question-box label {
-            font-weight: 500;
-            font-size: 16px;
-        }
-
-        .radio-group {
-            display: flex;
-            gap: 15px;
-        }
-
-        .radio-group label {
-            font-weight: 400;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            gap: 5px;
-        }
-
-        .radio-group input[type="radio"] {
-            transform: scale(1.2);
-            cursor: pointer;
-        }
-
-        /* --- DISEÑO DE LA TABLA --- */
+        /* --- DISEÑO DE LA TABLA (MÁS COMPACTO) --- */
         .table-responsive {
             overflow-x: auto;
             border: 1px solid var(--border-color);
@@ -150,11 +112,11 @@
         table {
             border-collapse: collapse;
             width: 100%;
-            min-width: 600px;
+            min-width: 100%; /* Ajustable */
         }
 
         th, td {
-            padding: 12px 10px;
+            padding: 8px 4px; /* Reducido para que queden más juntos */
             text-align: center;
             vertical-align: middle;
             border-bottom: 1px solid var(--border-color);
@@ -163,15 +125,15 @@
         th {
             font-weight: 500;
             color: var(--text-muted);
-            font-size: 15px;
+            font-size: 13px;
             background-color: #ffffff;
-            padding: 16px 10px;
         }
 
         th:first-child, td:first-child {
             text-align: left;
-            min-width: 200px;
-            padding-left: 20px;
+            min-width: 140px; /* Reducido para móvil */
+            padding-left: 10px;
+            font-size: 13px;
         }
 
         tbody tr:last-child td {
@@ -182,12 +144,11 @@
             border: none;
             background: transparent;
             font-family: inherit;
-            font-size: 15px;
+            font-size: 13px;
             color: var(--text-main);
             width: 100%;
-            padding: 5px;
+            padding: 4px;
             border-radius: 4px;
-            transition: background 0.2s;
         }
 
         input[type="text"].editable-text:focus {
@@ -195,17 +156,17 @@
             background: #f0f0f0;
         }
 
+        /* Cuadros numéricos más pequeños y juntos */
         .cell-number-input {
-            width: 38px;
-            height: 38px;
+            width: 28px;
+            height: 28px;
             text-align: center;
             border: 1px solid #e0e0e0;
             border-radius: 6px;
             font-family: 'Inter', sans-serif;
-            font-size: 15px;
+            font-size: 13px;
             color: var(--text-main);
             background: #fff;
-            transition: all 0.2s ease;
             margin: 0 auto;
             display: block;
         }
@@ -213,22 +174,20 @@
         .cell-number-input:focus {
             outline: none;
             border-color: var(--primary-color);
-            box-shadow: 0 0 0 2px rgba(217, 115, 115, 0.2);
         }
 
+        /* Checkboxes más grandes y centrados */
         .checkbox-wrapper {
             display: flex;
             justify-content: center;
             align-items: center;
-            width: 100%;
-            height: 100%;
         }
 
         input[type="checkbox"] {
             appearance: none;
             -webkit-appearance: none;
-            width: 24px;
-            height: 24px;
+            width: 26px; /* Más grande para ver bien en móvil */
+            height: 26px;
             border: 2px solid #e0e0e0;
             border-radius: 6px;
             background-color: #fff;
@@ -236,12 +195,7 @@
             display: inline-flex;
             align-items: center;
             justify-content: center;
-            transition: all 0.2s ease;
             margin: 0;
-        }
-
-        input[type="checkbox"]:hover {
-            border-color: #c0c0c0;
         }
 
         input[type="checkbox"]:checked {
@@ -251,39 +205,64 @@
 
         input[type="checkbox"]:checked::after {
             content: '';
-            width: 5px;
-            height: 10px;
+            width: 6px;
+            height: 12px;
             border: solid white;
             border-width: 0 2px 2px 0;
             transform: rotate(45deg);
-            margin-bottom: 2px;
+            margin-bottom: 3px;
         }
 
         .actions {
             display: flex;
-            gap: 10px;
-            margin-bottom: 30px;
+            gap: 8px;
+            margin-bottom: 20px;
         }
 
         .btn-action {
             font-family: 'Inter', sans-serif;
-            font-size: 14px;
+            font-size: 13px;
             font-weight: 500;
-            padding: 10px 18px;
-            border-radius: 8px;
+            padding: 8px 12px;
+            border-radius: 6px;
             cursor: pointer;
-            transition: all 0.2s;
             border: 1px solid #e0e0e0;
             background: #ffffff;
             color: #555;
         }
 
-        .btn-action:hover {
+        /* --- PREGUNTA CONDICIONAL --- */
+        .question-box {
             background: #f9f9f9;
-            border-color: #ccc;
+            padding: 12px 15px;
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 20px;
+            margin-top: 20px;
         }
 
-        /* Ocultar la sección de servicios por defecto */
+        .question-box label {
+            font-weight: 500;
+            font-size: 14px;
+        }
+
+        .radio-group {
+            display: flex;
+            gap: 15px;
+        }
+
+        .radio-group label {
+            font-weight: 400;
+            font-size: 14px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
         #servicios-section {
             display: none;
         }
@@ -293,21 +272,13 @@
 
 <div class="container">
     
-    <!-- CONTROLES SUPERIORES -->
+    <!-- CONTROLES SUPERIORES (Código obligatorio y descarga) -->
     <div class="top-controls">
         <h1>Distribución y Dependencias</h1>
         <div class="export-group">
-            <input type="text" id="codigoInput" class="code-input" placeholder="CÓDIGO (EJ: ENE120102)">
+            <!-- El asterisco indica que es obligatorio -->
+            <input type="text" id="codigoInput" class="code-input" placeholder="CÓDIGO * (EJ: ENE120102)" required>
             <button class="btn-primary" onclick="descargarExcel()">Descargar Excel</button>
-        </div>
-    </div>
-
-    <!-- PREGUNTA CONDICIONAL -->
-    <div class="question-box">
-        <label>¿Tiene servicios comunales?</label>
-        <div class="radio-group">
-            <label><input type="radio" name="tieneServicios" value="no" checked> No</label>
-            <label><input type="radio" name="tieneServicios" value="si"> Sí</label>
         </div>
     </div>
     
@@ -330,7 +301,15 @@
         <button class="btn-action" onclick="agregarColumna()">+ Añadir Piso</button>
     </div>
 
-    <!-- SECCIÓN DE SERVICIOS (OCULTA POR DEFECTO) -->
+    <!-- PREGUNTA Y SERVICIOS (AHORA DEBAJO DE DEPENDENCIAS) -->
+    <div class="question-box">
+        <label>¿Tiene servicios comunales?</label>
+        <div class="radio-group">
+            <label><input type="radio" name="tieneServicios" value="no" checked> No</label>
+            <label><input type="radio" name="tieneServicios" value="si"> Sí</label>
+        </div>
+    </div>
+
     <div id="servicios-section">
         <h2>Servicios Comunales</h2>
         <div class="table-responsive">
@@ -354,7 +333,6 @@
 </div>
 
 <script>
-    // --- DATOS INICIALES ---
     const dependenciasIniciales = [
         "Hall acceso", "Sala", "Comedor", "Cocina", "Zona de ropas", 
         "Patio", "Antejardín", "Balcón", "Garaje cubierto", "Garaje descubierto", 
@@ -373,10 +351,8 @@
         "PARQUEADERO VISITANTES", "PARQUEADERO COMÚN RESIDENTES"
     ];
 
-    // --- CAMBIO 1: INICIAR CON 5 PISOS ---
     let numPisos = 5; 
 
-    // --- FUNCIONES DE CREACIÓN DE ELEMENTOS ---
     function crearInputNumero() {
         const input = document.createElement('input');
         input.type = 'text';
@@ -395,7 +371,6 @@
         return wrapper;
     }
 
-    // --- INICIALIZACIÓN DE TABLAS ---
     function inicializarTabla() {
         const headerRow = document.getElementById('dependencias-header');
         const tbody = document.getElementById('dependencias-body');
@@ -452,7 +427,6 @@
         tbody.appendChild(tr);
     }
 
-    // --- FUNCIONES DINÁMICAS ---
     function agregarFila() {
         const tbody = document.getElementById('dependencias-body');
         const tr = document.createElement('tr');
@@ -495,7 +469,6 @@
         agregarFilaServicio();
     }
 
-    // --- LÓGICA DE LA PREGUNTA CONDICIONAL ---
     document.querySelectorAll('input[name="tieneServicios"]').forEach(radio => {
         radio.addEventListener('change', (e) => {
             const seccionServicios = document.getElementById('servicios-section');
@@ -507,19 +480,27 @@
         });
     });
 
-    // --- EXPORTACIÓN A EXCEL ---
     function descargarExcel() {
-        const codigo = document.getElementById('codigoInput').value.trim().toUpperCase();
+        const codigoInput = document.getElementById('codigoInput');
+        const codigo = codigoInput.value.trim().toUpperCase();
         const regexCodigo = /^[A-Z]{3}\d{6}$/;
 
+        // VALIDACIÓN OBLIGATORIA
+        if (codigo === '') {
+            alert("⚠️ El campo 'CÓDIGO' es obligatorio para poder descargar el Excel.");
+            codigoInput.focus();
+            return;
+        }
+
         if (!regexCodigo.test(codigo)) {
-            alert("⚠️ Error: Debe ingresar un código válido.\nFormato requerido: 3 letras y 6 números (Ejemplo: ENE120102).");
+            alert("⚠️ El código ingresado no es válido.\nDebe tener 3 letras y 6 números (Ejemplo: ENE120102).");
+            codigoInput.focus();
             return;
         }
 
         const wb = XLSX.utils.book_new();
 
-        // Hoja 1: Dependencias (Siempre se exporta)
+        // Hoja 1: Dependencias
         const datosDependencias = [];
         const headersDep = [];
         
@@ -539,7 +520,7 @@
         const wsDep = XLSX.utils.aoa_to_sheet(datosDependencias);
         XLSX.utils.book_append_sheet(wb, wsDep, "Dependencias");
 
-        // Hoja 2: Servicios Comunales (Solo se exporta si la respuesta es "Sí")
+        // Hoja 2: Servicios Comunales
         const tieneServicios = document.querySelector('input[name="tieneServicios"]:checked').value === 'si';
         
         if (tieneServicios) {
@@ -557,7 +538,6 @@
         XLSX.writeFile(wb, `Registro_Inmueble_${codigo}.xlsx`);
     }
 
-    // Iniciar aplicación
     window.onload = function() {
         inicializarTabla();
         inicializarServicios();
