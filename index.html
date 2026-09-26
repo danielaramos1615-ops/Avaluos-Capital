@@ -5,7 +5,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Registro de Dependencias y Servicios</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+    <!-- Librerías para Excel y PDF -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.31/jspdf.plugin.autotable.min.js"></script>
+    
     <style>
         :root {
             --primary-color: #d97373;
@@ -154,7 +158,7 @@
         td:first-child {
             display: flex;
             align-items: center;
-            gap: 8px; /* Espacio entre el checkbox y el texto */
+            gap: 8px;
         }
 
         tbody tr:last-child td {
@@ -202,7 +206,7 @@
             border-color: var(--primary-color);
         }
 
-        /* --- CHECKBOX DE SELECCIÓN DE FILA --- */
+        /* --- CHECKBOX DE SELECCIÓN DE FILA (OCULTOS) --- */
         .row-selector {
             appearance: none;
             -webkit-appearance: none;
@@ -212,12 +216,16 @@
             border-radius: 4px;
             background-color: #fff;
             cursor: pointer;
-            display: inline-flex;
+            display: none;
             align-items: center;
             justify-content: center;
             flex-shrink: 0;
             margin: 0;
             transition: all 0.2s;
+        }
+
+        .selection-mode .row-selector {
+            display: inline-flex;
         }
 
         .row-selector:checked {
@@ -235,7 +243,7 @@
             margin-bottom: 1px;
         }
 
-        /* --- BOTONES DE ELIMINAR COLUMNAS (LONG PRESS) --- */
+        /* --- BOTONES DE ELIMINAR COLUMNAS --- */
         .btn-del-col {
             display: none;
             background: #ffffff;
@@ -313,7 +321,9 @@
             gap: 10px;
             align-items: center;
             width: 100%;
-            max-width: 450px;
+            max-width: 600px; /* Más ancho para que quepan los dos botones */
+            flex-wrap: wrap; /* Para que bajen si la pantalla es muy pequeña */
+            justify-content: center;
         }
 
         .code-input {
@@ -325,6 +335,7 @@
             flex-grow: 1;
             text-transform: uppercase;
             text-align: center;
+            min-width: 200px;
         }
 
         .code-input:focus {
@@ -348,6 +359,14 @@
 
         .btn-primary:hover {
             background: #000;
+        }
+
+        .btn-pdf {
+            background: var(--primary-color);
+        }
+
+        .btn-pdf:hover {
+            background: #c06060;
         }
 
         h2 {
@@ -437,11 +456,12 @@
         </div>
     </div>
 
-    <!-- CÓDIGO Y DESCARGA -->
+    <!-- CÓDIGO Y DESCARGAS -->
     <div class="bottom-controls">
         <div class="export-group">
             <input type="text" id="codigoInput" class="code-input" placeholder="CÓDIGO OBLIGATORIO * (EJ: ENE120102)" required>
             <button class="btn-primary" onclick="descargarExcel()">Descargar Excel</button>
+            <button class="btn-primary btn-pdf" onclick="descargarPDF()">Descargar PDF</button>
         </div>
     </div>
 
@@ -631,6 +651,7 @@
         if (confirm(`¿Estás seguro de que quieres eliminar ${seleccionadas.length} dependencia(s)?`)) {
             seleccionadas.forEach(cb => cb.closest('tr').remove());
             document.getElementById('select-all-dep').checked = false;
+            document.getElementById('dependencias-body').classList.remove('selection-mode');
         }
     }
 
@@ -643,10 +664,11 @@
         if (confirm(`¿Estás seguro de que quieres eliminar ${seleccionadas.length} servicio(s)?`)) {
             seleccionadas.forEach(cb => cb.closest('tr').remove());
             document.getElementById('select-all-serv').checked = false;
+            document.getElementById('servicios-body').classList.remove('selection-mode');
         }
     }
 
-    // --- FUNCIÓN PARA ELIMINAR COLUMNAS (CON PRESIÓN PROLONGADA) ---
+    // --- FUNCIÓN PARA ELIMINAR COLUMNAS ---
     function eliminarColumna(btn) {
         if (confirm("¿Estás seguro de que quieres eliminar este piso/columna?")) {
             const th = btn.parentElement;
@@ -671,29 +693,53 @@
         }
     }
 
-    // Lógica de mantener presionado para mostrar la X en las columnas
+    // --- LÓGICA DE MANTENER PRESIONADO (LONG PRESS) ---
     let pressTimer;
     const DELAY = 500; 
-    const thead = document.getElementById('dependencias-header');
 
-    function iniciarPresion(e) {
+    function iniciarPresion(e, tipo) {
         if (e.type === 'mousedown' && e.button !== 0) return;
-        const contenedor = e.target.closest('th:not(:first-child)');
-        if (!contenedor) return;
+        if (e.target.classList.contains('row-selector') || e.target.classList.contains('editable-text')) return;
 
-        pressTimer = setTimeout(() => {
-            const btn = contenedor.querySelector('.btn-del-col');
-            if (btn) {
-                document.querySelectorAll('.show-delete').forEach(el => el.classList.remove('show-delete'));
-                btn.classList.add('show-delete');
-            }
-        }, DELAY);
+        if (tipo === 'columna') {
+            const contenedor = e.target.closest('th:not(:first-child)');
+            if (!contenedor) return;
+            pressTimer = setTimeout(() => {
+                const btn = contenedor.querySelector('.btn-del-col');
+                if (btn) {
+                    document.querySelectorAll('.show-delete').forEach(el => el.classList.remove('show-delete'));
+                    btn.classList.add('show-delete');
+                }
+            }, DELAY);
+        } else if (tipo === 'fila') {
+            const contenedor = e.target.closest('td:first-child');
+            if (!contenedor) return;
+            const tbody = contenedor.closest('tbody');
+            pressTimer = setTimeout(() => {
+                document.querySelectorAll('tbody').forEach(tb => {
+                    if (tb !== tbody) tb.classList.remove('selection-mode');
+                });
+                tbody.classList.add('selection-mode');
+            }, DELAY);
+        }
     }
 
-    function cancelarPresion() { clearTimeout(pressTimer); }
+    function cancelarPresion() {
+        clearTimeout(pressTimer);
+    }
 
-    thead.addEventListener('mousedown', iniciarPresion);
-    thead.addEventListener('touchstart', iniciarPresion, {passive: true});
+    const thead = document.getElementById('dependencias-header');
+    thead.addEventListener('mousedown', (e) => iniciarPresion(e, 'columna'));
+    thead.addEventListener('touchstart', (e) => iniciarPresion(e, 'columna'), {passive: true});
+
+    const tbodyDep = document.getElementById('dependencias-body');
+    tbodyDep.addEventListener('mousedown', (e) => iniciarPresion(e, 'fila'));
+    tbodyDep.addEventListener('touchstart', (e) => iniciarPresion(e, 'fila'), {passive: true});
+
+    const tbodyServ = document.getElementById('servicios-body');
+    tbodyServ.addEventListener('mousedown', (e) => iniciarPresion(e, 'fila'));
+    tbodyServ.addEventListener('touchstart', (e) => iniciarPresion(e, 'fila'), {passive: true});
+
     document.addEventListener('mouseup', cancelarPresion);
     document.addEventListener('touchend', cancelarPresion);
     document.addEventListener('mouseleave', cancelarPresion);
@@ -702,6 +748,9 @@
     document.addEventListener('click', (e) => {
         if (!e.target.classList.contains('btn-del-col')) {
             document.querySelectorAll('.show-delete').forEach(el => el.classList.remove('show-delete'));
+        }
+        if (!e.target.closest('table') || e.target.classList.contains('btn-danger')) {
+            document.querySelectorAll('.selection-mode').forEach(el => el.classList.remove('selection-mode'));
         }
     });
 
@@ -740,23 +789,30 @@
         }
     });
 
-    // --- EXPORTACIÓN A EXCEL ---
-    function descargarExcel() {
+    // --- VALIDACIÓN DE CÓDIGO (REUTILIZABLE) ---
+    function validarCodigo() {
         const codigoInput = document.getElementById('codigoInput');
         const codigo = codigoInput.value.trim().toUpperCase();
         const regexCodigo = /^[A-Z]{3}\d{6}$/;
 
         if (codigo === '') {
-            alert("⚠️ El campo 'CÓDIGO' es obligatorio para poder descargar el Excel.");
+            alert("⚠️ El campo 'CÓDIGO' es obligatorio para poder descargar el archivo.");
             codigoInput.focus();
-            return;
+            return null;
         }
 
         if (!regexCodigo.test(codigo)) {
             alert("⚠️ El código ingresado no es válido.\nDebe tener 3 letras y 6 números (Ejemplo: ENE120102).");
             codigoInput.focus();
-            return;
+            return null;
         }
+        return codigo;
+    }
+
+    // --- EXPORTACIÓN A EXCEL ---
+    function descargarExcel() {
+        const codigo = validarCodigo();
+        if (!codigo) return;
 
         const wb = XLSX.utils.book_new();
 
@@ -800,6 +856,82 @@
         }
 
         XLSX.writeFile(wb, `Registro_Inmueble_${codigo}.xlsx`);
+    }
+
+    // --- EXPORTACIÓN A PDF ---
+    function descargarPDF() {
+        const codigo = validarCodigo();
+        if (!codigo) return;
+
+        // Inicializar jsPDF en modo horizontal (landscape) para que quepan las columnas
+        const { jsPDF } = window.jspdf;
+        const doc = new jsPDF('landscape');
+
+        // Título del documento
+        doc.setFontSize(16);
+        doc.text(`REGISTRO DE INMUEBLE`, 14, 15);
+        doc.setFontSize(11);
+        doc.text(`Código: ${codigo}`, 14, 22);
+
+        // Preparar datos de Dependencias
+        const headersDep = ["DEPENDENCIA / PISOS"];
+        document.querySelectorAll('#dependencias-header th').forEach((th, index) => {
+            if (index > 0) headersDep.push(th.querySelector('.col-title').textContent.trim());
+        });
+
+        const bodyDep = [];
+        document.querySelectorAll('#dependencias-body tr').forEach(tr => {
+            const row = [];
+            row.push(tr.querySelector('input[type="text"]').value);
+            tr.querySelectorAll('.cell-number-input').forEach(input => {
+                row.push(input.value || '-'); // Guion si está vacío
+            });
+            bodyDep.push(row);
+        });
+
+        // Generar tabla de Dependencias
+        doc.autoTable({
+            startY: 30,
+            head: [headersDep],
+            body: bodyDep,
+            theme: 'grid',
+            headStyles: { fillColor: [217, 115, 115] }, // Color rosa suave
+            styles: { fontSize: 8, cellPadding: 2 }
+        });
+
+        // Verificar si hay servicios comunales
+        const tieneServicios = document.querySelector('input[name="tieneServicios"]:checked').value === 'si';
+        if (tieneServicios) {
+            const bodyServ = [];
+            document.querySelectorAll('#servicios-body tr').forEach(tr => {
+                const nombre = tr.querySelector('input[type="text"]').value;
+                const marcado = tr.querySelector('.service-check').checked ? 'X' : '';
+                bodyServ.push([nombre, marcado]);
+            });
+
+            let finalY = doc.lastAutoTable.finalY + 15;
+            
+            // Si no cabe en la página actual, añadir nueva página
+            if (finalY > 180) {
+                doc.addPage();
+                finalY = 20;
+            }
+
+            doc.setFontSize(12);
+            doc.text("SERVICIOS COMUNALES", 14, finalY);
+
+            doc.autoTable({
+                startY: finalY + 5,
+                head: [["SERVICIO", "INCLUIDO"]],
+                body: bodyServ,
+                theme: 'grid',
+                headStyles: { fillColor: [217, 115, 115] },
+                styles: { fontSize: 8, cellPadding: 2 }
+            });
+        }
+
+        // Descargar PDF
+        doc.save(`Registro_Inmueble_${codigo}.pdf`);
     }
 
     // --- INICIALIZACIÓN ---
