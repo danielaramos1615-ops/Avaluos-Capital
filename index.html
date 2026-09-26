@@ -81,6 +81,7 @@
             display: flex;
             gap: 8px;
             margin-bottom: 15px;
+            flex-wrap: wrap;
         }
 
         .btn-action {
@@ -101,6 +102,17 @@
             border-color: #ccc;
         }
 
+        .btn-danger {
+            color: #d9534f;
+            border-color: #d9534f;
+            background: #fff5f5;
+        }
+
+        .btn-danger:hover {
+            background: #d9534f;
+            color: white;
+        }
+
         /* --- DISEÑO DE LA TABLA --- */
         .table-responsive {
             overflow-x: auto;
@@ -112,10 +124,6 @@
 
         table {
             border-collapse: collapse;
-            width: 100%;
-        }
-
-        #servicios-table {
             width: 100%;
         }
 
@@ -146,15 +154,14 @@
         td:first-child {
             display: flex;
             align-items: center;
-            justify-content: space-between;
-            gap: 5px;
+            gap: 8px; /* Espacio entre el checkbox y el texto */
         }
 
         tbody tr:last-child td {
             border-bottom: none;
         }
 
-        /* Input de texto editable (AHORA FORZADO A MAYÚSCULAS VISUALMENTE) */
+        /* Input de texto editable */
         input[type="text"].editable-text {
             border: none;
             background: transparent;
@@ -162,11 +169,11 @@
             font-size: 13px;
             color: var(--text-main);
             width: 100%;
-            min-width: 100px;
+            min-width: 80px;
             padding: 4px;
             border-radius: 4px;
             user-select: auto;
-            text-transform: uppercase; /* Fuerza visualmente a mayúsculas */
+            text-transform: uppercase;
         }
 
         input[type="text"].editable-text:focus {
@@ -195,29 +202,56 @@
             border-color: var(--primary-color);
         }
 
-        /* --- BOTONES DE ELIMINAR --- */
-        .btn-del {
+        /* --- CHECKBOX DE SELECCIÓN DE FILA --- */
+        .row-selector {
+            appearance: none;
+            -webkit-appearance: none;
+            width: 18px;
+            height: 18px;
+            border: 2px solid #ccc;
+            border-radius: 4px;
+            background-color: #fff;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            margin: 0;
+            transition: all 0.2s;
+        }
+
+        .row-selector:checked {
+            background-color: var(--primary-color);
+            border-color: var(--primary-color);
+        }
+
+        .row-selector:checked::after {
+            content: '';
+            width: 4px;
+            height: 8px;
+            border: solid white;
+            border-width: 0 2px 2px 0;
+            transform: rotate(45deg);
+            margin-bottom: 1px;
+        }
+
+        /* --- BOTONES DE ELIMINAR COLUMNAS (LONG PRESS) --- */
+        .btn-del-col {
             display: none;
             background: #ffffff;
             color: #555;
             border: 1px solid #ddd;
             border-radius: 4px;
             cursor: pointer;
-            font-size: 12px;
+            font-size: 11px;
             font-weight: 600;
-            padding: 2px 6px;
+            padding: 1px 5px;
             transition: all 0.2s;
-            margin-left: 5px;
+            margin-left: 6px;
             box-shadow: 0 1px 3px rgba(0,0,0,0.05);
         }
         
-        .btn-del-col {
-            margin-left: 6px;
-            padding: 1px 5px;
-            font-size: 11px;
-        }
-
-        .btn-del:hover {
+        .btn-del-col:hover {
             background: #f5f5f5;
             border-color: #ccc;
             color: #000;
@@ -227,14 +261,14 @@
             display: inline-block !important;
         }
 
-        /* --- CHECKBOXES --- */
+        /* --- CHECKBOXES SERVICIOS --- */
         .checkbox-wrapper {
             display: flex;
             justify-content: center;
             align-items: center;
         }
 
-        input[type="checkbox"] {
+        input[type="checkbox"].service-check {
             appearance: none;
             -webkit-appearance: none;
             width: 28px;
@@ -250,12 +284,12 @@
             white-space: nowrap;
         }
 
-        input[type="checkbox"]:checked {
+        input[type="checkbox"].service-check:checked {
             background-color: var(--primary-color);
             border-color: var(--primary-color);
         }
 
-        input[type="checkbox"]:checked::after {
+        input[type="checkbox"].service-check:checked::after {
             content: '';
             width: 6px;
             height: 12px;
@@ -344,10 +378,11 @@
         </div>
     </div>
 
-    <!-- BOTONES DE AGREGAR -->
+    <!-- BOTONES DE AGREGAR Y ELIMINAR -->
     <div class="actions-top">
         <button class="btn-action" onclick="agregarFila()">+ Añadir Fila</button>
         <button class="btn-action" onclick="agregarColumna()">+ Añadir Piso</button>
+        <button class="btn-action btn-danger" onclick="eliminarSeleccionadasDependencias()">🗑️ Eliminar Seleccionadas</button>
     </div>
     
     <!-- TABLA DEPENDENCIAS -->
@@ -355,7 +390,12 @@
         <table id="dependencias-table">
             <thead>
                 <tr id="dependencias-header">
-                    <th>Dependencia / Pisos</th>
+                    <th>
+                        <div style="display:flex; align-items:center; gap:5px;">
+                            <input type="checkbox" class="row-selector" id="select-all-dep" onclick="toggleSelectAllDep(this)">
+                            <span>Dependencia / Pisos</span>
+                        </div>
+                    </th>
                 </tr>
             </thead>
             <tbody id="dependencias-body">
@@ -378,7 +418,12 @@
             <table id="servicios-table">
                 <thead>
                     <tr>
-                        <th>Servicio</th>
+                        <th>
+                            <div style="display:flex; align-items:center; gap:5px;">
+                                <input type="checkbox" class="row-selector" id="select-all-serv" onclick="toggleSelectAllServ(this)">
+                                <span>Servicio</span>
+                            </div>
+                        </th>
                         <th>Incluido</th>
                     </tr>
                 </thead>
@@ -388,6 +433,7 @@
         </div>
         <div class="actions-top">
             <button class="btn-action" onclick="agregarServicio()">+ Añadir Servicio</button>
+            <button class="btn-action btn-danger" onclick="eliminarSeleccionadasServicios()">🗑️ Eliminar Seleccionados</button>
         </div>
     </div>
 
@@ -402,7 +448,7 @@
 </div>
 
 <script>
-    // --- BASES DE DATOS DE DEPENDENCIAS (AHORA EN MAYÚSCULAS) ---
+    // --- BASES DE DATOS DE DEPENDENCIAS ---
     const dependenciasResidenciales = [
         "HALL ACCESO", "SALA", "COMEDOR", "COCINA", "ZONA DE ROPAS", 
         "PATIO", "ANTEJARDÍN", "BALCÓN", "GARAJE CUBIERTO", "GARAJE DESCUBIERTO", 
@@ -445,11 +491,12 @@
         return input;
     }
 
-    function crearCheckbox() {
+    function crearCheckboxServicio() {
         const wrapper = document.createElement('div');
         wrapper.className = 'checkbox-wrapper';
         const cb = document.createElement('input');
         cb.type = 'checkbox';
+        cb.className = 'service-check';
         wrapper.appendChild(cb);
         return wrapper;
     }
@@ -459,12 +506,18 @@
         const headerRow = document.getElementById('dependencias-header');
         const tbody = document.getElementById('dependencias-body');
 
-        headerRow.innerHTML = '<th>Dependencia / Pisos</th>';
+        headerRow.innerHTML = `
+            <th>
+                <div style="display:flex; align-items:center; gap:5px;">
+                    <input type="checkbox" class="row-selector" id="select-all-dep" onclick="toggleSelectAllDep(this)">
+                    <span>Dependencia / Pisos</span>
+                </div>
+            </th>`;
         tbody.innerHTML = '';
 
         for (let i = 1; i <= numPisos; i++) {
             const th = document.createElement('th');
-            th.innerHTML = `<span class="col-title">${i}</span> <button class="btn-del btn-del-col" onclick="eliminarColumna(this)">×</button>`;
+            th.innerHTML = `<span class="col-title">${i}</span> <button class="btn-del-col" onclick="eliminarColumna(this)">×</button>`;
             headerRow.appendChild(th);
         }
 
@@ -472,8 +525,10 @@
             const tr = document.createElement('tr');
             
             const tdNombre = document.createElement('td');
-            // Convertir el valor a mayúsculas al renderizar
-            tdNombre.innerHTML = `<input type="text" value="${dep.toUpperCase()}" class="editable-text"> <button class="btn-del" onclick="eliminarFila(this)">×</button>`;
+            tdNombre.innerHTML = `
+                <input type="checkbox" class="row-selector row-dep-check">
+                <input type="text" value="${dep.toUpperCase()}" class="editable-text">
+            `;
             tr.appendChild(tdNombre);
 
             for (let i = 1; i <= numPisos; i++) {
@@ -498,16 +553,13 @@
         const tr = document.createElement('tr');
         
         const tdNombre = document.createElement('td');
-        const inputNombre = document.createElement('input');
-        inputNombre.type = 'text';
-        // Convertir a mayúsculas al crear el input
-        inputNombre.value = nombre.toUpperCase(); 
-        inputNombre.placeholder = "NOMBRE DEL SERVICIO";
-        inputNombre.className = 'editable-text';
-        tdNombre.appendChild(inputNombre);
+        tdNombre.innerHTML = `
+            <input type="checkbox" class="row-selector row-serv-check">
+            <input type="text" value="${nombre.toUpperCase()}" placeholder="NOMBRE DEL SERVICIO" class="editable-text">
+        `;
         
         const tdCheck = document.createElement('td');
-        tdCheck.appendChild(crearCheckbox());
+        tdCheck.appendChild(crearCheckboxServicio());
 
         tr.appendChild(tdNombre);
         tr.appendChild(tdCheck);
@@ -523,7 +575,10 @@
         const tr = document.createElement('tr');
         
         const tdNombre = document.createElement('td');
-        tdNombre.innerHTML = `<input type="text" placeholder="NUEVA DEPENDENCIA" class="editable-text"> <button class="btn-del" onclick="eliminarFila(this)">×</button>`;
+        tdNombre.innerHTML = `
+            <input type="checkbox" class="row-selector row-dep-check">
+            <input type="text" placeholder="NUEVA DEPENDENCIA" class="editable-text">
+        `;
         tr.appendChild(tdNombre);
 
         for (let i = 0; i < totalColumnas; i++) {
@@ -540,7 +595,7 @@
         const newColNum = headerRow.children.length; 
 
         const th = document.createElement('th');
-        th.innerHTML = `<span class="col-title">${newColNum}</span> <button class="btn-del btn-del-col" onclick="eliminarColumna(this)">×</button>`;
+        th.innerHTML = `<span class="col-title">${newColNum}</span> <button class="btn-del-col" onclick="eliminarColumna(this)">×</button>`;
         headerRow.appendChild(th);
 
         const filas = tbody.querySelectorAll('tr');
@@ -556,14 +611,42 @@
         agregarFilaServicio();
     }
 
-    // --- FUNCIONES DE ELIMINAR ---
-    function eliminarFila(btn) {
-        if (confirm("¿Estás seguro de que quieres eliminar esta fila?")) {
-            btn.closest('tr').remove();
-            document.querySelectorAll('.show-delete').forEach(el => el.classList.remove('show-delete'));
+    // --- FUNCIONES DE SELECCIÓN Y ELIMINACIÓN MASIVA ---
+    function toggleSelectAllDep(source) {
+        const checkboxes = document.querySelectorAll('.row-dep-check');
+        checkboxes.forEach(cb => cb.checked = source.checked);
+    }
+
+    function toggleSelectAllServ(source) {
+        const checkboxes = document.querySelectorAll('.row-serv-check');
+        checkboxes.forEach(cb => cb.checked = source.checked);
+    }
+
+    function eliminarSeleccionadasDependencias() {
+        const seleccionadas = document.querySelectorAll('.row-dep-check:checked');
+        if (seleccionadas.length === 0) {
+            alert("No has seleccionado ninguna dependencia para eliminar.");
+            return;
+        }
+        if (confirm(`¿Estás seguro de que quieres eliminar ${seleccionadas.length} dependencia(s)?`)) {
+            seleccionadas.forEach(cb => cb.closest('tr').remove());
+            document.getElementById('select-all-dep').checked = false;
         }
     }
 
+    function eliminarSeleccionadasServicios() {
+        const seleccionadas = document.querySelectorAll('.row-serv-check:checked');
+        if (seleccionadas.length === 0) {
+            alert("No has seleccionado ningún servicio para eliminar.");
+            return;
+        }
+        if (confirm(`¿Estás seguro de que quieres eliminar ${seleccionadas.length} servicio(s)?`)) {
+            seleccionadas.forEach(cb => cb.closest('tr').remove());
+            document.getElementById('select-all-serv').checked = false;
+        }
+    }
+
+    // --- FUNCIÓN PARA ELIMINAR COLUMNAS (CON PRESIÓN PROLONGADA) ---
     function eliminarColumna(btn) {
         if (confirm("¿Estás seguro de que quieres eliminar este piso/columna?")) {
             const th = btn.parentElement;
@@ -588,17 +671,18 @@
         }
     }
 
-    // --- LÓGICA DE "MANTENER PRESIONADO" (LONG PRESS) ---
+    // Lógica de mantener presionado para mostrar la X en las columnas
     let pressTimer;
     const DELAY = 500; 
+    const thead = document.getElementById('dependencias-header');
 
-    function iniciarPresion(e, elementoABuscar, claseBoton) {
+    function iniciarPresion(e) {
         if (e.type === 'mousedown' && e.button !== 0) return;
-        const contenedor = e.target.closest(elementoABuscar);
+        const contenedor = e.target.closest('th:not(:first-child)');
         if (!contenedor) return;
 
         pressTimer = setTimeout(() => {
-            const btn = contenedor.querySelector(claseBoton);
+            const btn = contenedor.querySelector('.btn-del-col');
             if (btn) {
                 document.querySelectorAll('.show-delete').forEach(el => el.classList.remove('show-delete'));
                 btn.classList.add('show-delete');
@@ -606,25 +690,17 @@
         }, DELAY);
     }
 
-    function cancelarPresion() {
-        clearTimeout(pressTimer);
-    }
+    function cancelarPresion() { clearTimeout(pressTimer); }
 
-    const tbody = document.getElementById('dependencias-body');
-    tbody.addEventListener('mousedown', (e) => iniciarPresion(e, 'td:first-child', '.btn-del'));
-    tbody.addEventListener('touchstart', (e) => iniciarPresion(e, 'td:first-child', '.btn-del'), {passive: true});
-    
-    const thead = document.getElementById('dependencias-header');
-    thead.addEventListener('mousedown', (e) => iniciarPresion(e, 'th:not(:first-child)', '.btn-del-col'));
-    thead.addEventListener('touchstart', (e) => iniciarPresion(e, 'th:not(:first-child)', '.btn-del-col'), {passive: true});
-
+    thead.addEventListener('mousedown', iniciarPresion);
+    thead.addEventListener('touchstart', iniciarPresion, {passive: true});
     document.addEventListener('mouseup', cancelarPresion);
     document.addEventListener('touchend', cancelarPresion);
     document.addEventListener('mouseleave', cancelarPresion);
     document.addEventListener('touchcancel', cancelarPresion);
 
     document.addEventListener('click', (e) => {
-        if (!e.target.classList.contains('btn-del')) {
+        if (!e.target.classList.contains('btn-del-col')) {
             document.querySelectorAll('.show-delete').forEach(el => el.classList.remove('show-delete'));
         }
     });
@@ -657,14 +733,9 @@
     // --- LÓGICA PARA FORZAR MAYÚSCULAS EN TIEMPO REAL ---
     document.addEventListener('input', function(e) {
         if (e.target.classList.contains('editable-text')) {
-            // Guarda la posición del cursor
             const start = e.target.selectionStart;
             const end = e.target.selectionEnd;
-            
-            // Convierte a mayúsculas
             e.target.value = e.target.value.toUpperCase();
-            
-            // Restaura la posición del cursor para que no salte al final
             e.target.setSelectionRange(start, end);
         }
     });
@@ -720,7 +791,7 @@
             const datosServicios = [["Servicio", "Incluido"]];
             document.querySelectorAll('#servicios-body tr').forEach(tr => {
                 const nombre = tr.querySelector('input[type="text"]').value;
-                const marcado = tr.querySelector('input[type="checkbox"]').checked ? 'X' : '';
+                const marcado = tr.querySelector('.service-check').checked ? 'X' : '';
                 datosServicios.push([nombre, marcado]);
             });
 
