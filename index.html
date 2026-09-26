@@ -34,7 +34,6 @@
             box-shadow: 0 10px 40px rgba(0,0,0,0.04);
         }
 
-        /* --- ENCABEZADO --- */
         .header-title {
             font-weight: 600;
             font-size: 22px;
@@ -44,18 +43,18 @@
             text-align: center;
         }
 
-        /* --- CUADROS DE PREGUNTAS (BLANQUITOS Y LIMPIOS) --- */
+        /* --- CUADROS DE PREGUNTAS --- */
         .question-box {
-            background: #ffffff; /* Fondo blanco */
+            background: #ffffff;
             padding: 12px 15px;
             border-radius: 8px;
-            border: 1px solid var(--border-color); /* Borde gris sutil */
+            border: 1px solid var(--border-color);
             display: flex;
             align-items: center;
             gap: 15px;
             margin-bottom: 20px;
             width: fit-content;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.02); /* Sombra muy suave */
+            box-shadow: 0 2px 5px rgba(0,0,0,0.02);
         }
 
         .question-box label {
@@ -77,7 +76,7 @@
             gap: 5px;
         }
 
-        /* --- BOTONES DE ACCIÓN (ARRIBA DE LA TABLA) --- */
+        /* --- BOTONES DE ACCIÓN --- */
         .actions-top {
             display: flex;
             gap: 8px;
@@ -102,7 +101,7 @@
             border-color: #ccc;
         }
 
-        /* --- DISEÑO DE LA TABLA COMPACTA --- */
+        /* --- DISEÑO DE LA TABLA --- */
         .table-responsive {
             overflow-x: auto;
             border: 1px solid var(--border-color);
@@ -117,16 +116,16 @@
         }
 
         #servicios-table {
-            width: fit-content;
-            min-width: 100%;
+            width: 100%; /* Forzar a que ocupe el ancho disponible */
         }
 
         th, td {
-            padding: 6px 4px;
+            padding: 8px 4px; /* Un poquito más de padding vertical para que respire */
             text-align: center;
             vertical-align: middle;
             border-bottom: 1px solid var(--border-color);
-            white-space: nowrap;
+            white-space: normal; /* ¡AQUÍ ESTÁ LA MAGIA! Permitir saltos de línea */
+            word-break: break-word; /* Evita que palabras muy largas desborden */
         }
 
         th {
@@ -137,10 +136,12 @@
             user-select: none;
         }
 
+        /* Ajuste específico para la primera columna (Nombres) */
         th:first-child, td:first-child {
             text-align: left;
             padding-left: 10px;
-            width: 1%;
+            width: auto; /* Dejar que el navegador calcule el ancho */
+            min-width: 150px; /* Ancho mínimo para que se vea el nombre */
         }
         
         td:first-child {
@@ -154,6 +155,7 @@
             border-bottom: none;
         }
 
+        /* Input de texto editable */
         input[type="text"].editable-text {
             border: none;
             background: transparent;
@@ -161,7 +163,7 @@
             font-size: 13px;
             color: var(--text-main);
             width: 100%;
-            min-width: 110px;
+            min-width: 100px; /* Reducido un poco para que no empuje tanto */
             padding: 4px;
             border-radius: 4px;
             user-select: auto;
@@ -172,6 +174,7 @@
             background: #f0f0f0;
         }
 
+        /* Cuadros numéricos */
         .cell-number-input {
             width: 30px;
             height: 30px;
@@ -184,6 +187,7 @@
             background: #fff;
             margin: 0 auto;
             display: block;
+            white-space: nowrap; /* Los números no deben saltar de línea */
         }
 
         .cell-number-input:focus {
@@ -191,7 +195,7 @@
             border-color: var(--primary-color);
         }
 
-        /* --- BOTONES DE ELIMINAR (BLANCOS Y OCULTOS) --- */
+        /* --- BOTONES DE ELIMINAR --- */
         .btn-del {
             display: none;
             background: #ffffff;
@@ -243,6 +247,7 @@
             align-items: center;
             justify-content: center;
             margin: 0;
+            white-space: nowrap;
         }
 
         input[type="checkbox"]:checked {
@@ -260,7 +265,7 @@
             margin-bottom: 3px;
         }
 
-        /* --- SECCIÓN INFERIOR (CÓDIGO Y DESCARGA) --- */
+        /* --- SECCIÓN INFERIOR --- */
         .bottom-controls {
             margin-top: 40px;
             padding-top: 20px;
@@ -328,10 +333,9 @@
 
 <div class="container">
     
-    <!-- TÍTULO -->
     <div class="header-title">Registro de Inmueble</div>
 
-    <!-- 1. SELECCIÓN DE TIPO DE INMUEBLE (AHORA BLANCO Y LIMPIO) -->
+    <!-- TIPO DE INMUEBLE -->
     <div class="question-box">
         <label>Tipo de Inmueble:</label>
         <div class="radio-group">
@@ -340,13 +344,13 @@
         </div>
     </div>
 
-    <!-- 2. BOTONES DE AGREGAR (AHORA ARRIBA DE LA TABLA) -->
+    <!-- BOTONES DE AGREGAR -->
     <div class="actions-top">
         <button class="btn-action" onclick="agregarFila()">+ Añadir Fila</button>
         <button class="btn-action" onclick="agregarColumna()">+ Añadir Piso</button>
     </div>
     
-    <!-- 3. TABLA DEPENDENCIAS -->
+    <!-- TABLA DEPENDENCIAS -->
     <div class="table-responsive">
         <table id="dependencias-table">
             <thead>
@@ -355,12 +359,11 @@
                 </tr>
             </thead>
             <tbody id="dependencias-body">
-                <!-- Se llena con JS -->
             </tbody>
         </table>
     </div>
 
-    <!-- 4. PREGUNTA Y SERVICIOS -->
+    <!-- PREGUNTA Y SERVICIOS -->
     <div class="question-box">
         <label>¿Tiene servicios comunales?</label>
         <div class="radio-group">
@@ -380,7 +383,6 @@
                     </tr>
                 </thead>
                 <tbody id="servicios-body">
-                    <!-- Se llena con JS -->
                 </tbody>
             </table>
         </div>
@@ -389,7 +391,7 @@
         </div>
     </div>
 
-    <!-- 5. CÓDIGO OBLIGATORIO Y DESCARGA (AHORA ABAJO DEL TODO) -->
+    <!-- CÓDIGO Y DESCARGA -->
     <div class="bottom-controls">
         <div class="export-group">
             <input type="text" id="codigoInput" class="code-input" placeholder="CÓDIGO OBLIGATORIO * (EJ: ENE120102)" required>
@@ -400,7 +402,6 @@
 </div>
 
 <script>
-    // --- BASES DE DATOS DE DEPENDENCIAS ---
     const dependenciasResidenciales = [
         "Hall acceso", "Sala", "Comedor", "Cocina", "Zona de ropas", 
         "Patio", "Antejardín", "Balcón", "Garaje cubierto", "Garaje descubierto", 
@@ -429,11 +430,9 @@
         "PARQUEADERO VISITANTES", "PARQUEADERO COMÚN RESIDENTES"
     ];
 
-    // --- VARIABLES DE ESTADO ---
     let numPisos = 5; 
     let currentDependencias = dependenciasResidenciales; 
 
-    // --- FUNCIONES DE CREACIÓN ---
     function crearInputNumero() {
         const input = document.createElement('input');
         input.type = 'text';
@@ -452,7 +451,6 @@
         return wrapper;
     }
 
-    // --- RENDERIZADO DE LA TABLA ---
     function renderizarTablaDependencias() {
         const headerRow = document.getElementById('dependencias-header');
         const tbody = document.getElementById('dependencias-body');
@@ -510,7 +508,6 @@
         tbody.appendChild(tr);
     }
 
-    // --- FUNCIONES DE AGREGAR ---
     function agregarFila() {
         const tbody = document.getElementById('dependencias-body');
         const headerRow = document.getElementById('dependencias-header');
@@ -552,7 +549,6 @@
         agregarFilaServicio();
     }
 
-    // --- FUNCIONES DE ELIMINAR ---
     function eliminarFila(btn) {
         if (confirm("¿Estás seguro de que quieres eliminar esta fila?")) {
             btn.closest('tr').remove();
@@ -584,7 +580,6 @@
         }
     }
 
-    // --- LÓGICA DE "MANTENER PRESIONADO" (LONG PRESS) ---
     let pressTimer;
     const DELAY = 500; 
 
@@ -625,7 +620,6 @@
         }
     });
 
-    // --- LÓGICA DE TIPO DE INMUEBLE ---
     document.querySelectorAll('input[name="tipoInmueble"]').forEach(radio => {
         radio.addEventListener('change', (e) => {
             if (e.target.value === 'residencial') {
@@ -638,7 +632,6 @@
         });
     });
 
-    // --- LÓGICA DE SERVICIOS COMUNALES ---
     document.querySelectorAll('input[name="tieneServicios"]').forEach(radio => {
         radio.addEventListener('change', (e) => {
             const seccionServicios = document.getElementById('servicios-section');
@@ -650,7 +643,6 @@
         });
     });
 
-    // --- EXPORTACIÓN A EXCEL ---
     function descargarExcel() {
         const codigoInput = document.getElementById('codigoInput');
         const codigo = codigoInput.value.trim().toUpperCase();
@@ -712,7 +704,6 @@
         XLSX.writeFile(wb, `Registro_Inmueble_${codigo}.xlsx`);
     }
 
-    // --- INICIALIZACIÓN ---
     window.onload = function() {
         renderizarTablaDependencias();
         inicializarServicios();
