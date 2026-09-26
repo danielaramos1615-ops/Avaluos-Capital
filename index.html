@@ -34,84 +34,28 @@
             box-shadow: 0 10px 40px rgba(0,0,0,0.04);
         }
 
-        h1, h2 {
+        /* --- ENCABEZADO --- */
+        .header-title {
             font-weight: 600;
-            font-size: 20px;
+            font-size: 22px;
             margin-top: 0;
-            margin-bottom: 15px;
-            color: var(--text-main);
-        }
-
-        h2 {
-            margin-top: 30px;
-            font-size: 18px;
-        }
-
-        /* --- SECCIÓN SUPERIOR (CÓDIGO OBLIGATORIO Y DESCARGA) --- */
-        .top-controls {
-            display: flex;
-            flex-direction: column;
-            gap: 15px;
             margin-bottom: 20px;
-            padding-bottom: 15px;
-            border-bottom: 1px solid var(--border-color);
+            color: var(--text-main);
+            text-align: center;
         }
 
-        @media (min-width: 600px) {
-            .top-controls {
-                flex-direction: row;
-                justify-content: space-between;
-                align-items: center;
-            }
-            .top-controls h1 { margin-bottom: 0; }
-        }
-
-        .export-group {
-            display: flex;
-            gap: 8px;
-            align-items: center;
-            width: 100%;
-        }
-
-        .code-input {
-            padding: 10px 12px;
-            font-size: 14px;
-            font-family: 'Inter', sans-serif;
-            border: 2px solid var(--primary-color);
-            border-radius: 8px;
-            flex-grow: 1;
-            text-transform: uppercase;
-        }
-
-        .code-input:focus {
-            outline: none;
-            box-shadow: 0 0 0 3px rgba(217, 115, 115, 0.2);
-        }
-
-        .btn-primary {
-            background: var(--text-main);
-            color: white;
-            border: none;
-            padding: 10px 15px;
-            font-size: 14px;
-            font-family: 'Inter', sans-serif;
-            font-weight: 500;
-            border-radius: 8px;
-            cursor: pointer;
-            white-space: nowrap;
-        }
-
-        /* --- CUADRO DE PREGUNTAS --- */
+        /* --- CUADROS DE PREGUNTAS (BLANQUITOS Y LIMPIOS) --- */
         .question-box {
-            background: #f9f9f9;
+            background: #ffffff; /* Fondo blanco */
             padding: 12px 15px;
             border-radius: 8px;
-            border: 1px solid var(--border-color);
+            border: 1px solid var(--border-color); /* Borde gris sutil */
             display: flex;
             align-items: center;
             gap: 15px;
             margin-bottom: 20px;
             width: fit-content;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.02); /* Sombra muy suave */
         }
 
         .question-box label {
@@ -133,12 +77,37 @@
             gap: 5px;
         }
 
+        /* --- BOTONES DE ACCIÓN (ARRIBA DE LA TABLA) --- */
+        .actions-top {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 15px;
+        }
+
+        .btn-action {
+            font-family: 'Inter', sans-serif;
+            font-size: 13px;
+            font-weight: 500;
+            padding: 8px 12px;
+            border-radius: 6px;
+            cursor: pointer;
+            border: 1px solid #e0e0e0;
+            background: #ffffff;
+            color: #555;
+            transition: all 0.2s;
+        }
+
+        .btn-action:hover {
+            background: #f9f9f9;
+            border-color: #ccc;
+        }
+
         /* --- DISEÑO DE LA TABLA COMPACTA --- */
         .table-responsive {
             overflow-x: auto;
             border: 1px solid var(--border-color);
             border-radius: 12px;
-            margin-bottom: 15px;
+            margin-bottom: 20px;
             width: 100%;
         }
 
@@ -165,10 +134,9 @@
             color: var(--text-muted);
             font-size: 13px;
             background-color: #ffffff;
-            user-select: none; /* Evita seleccionar texto al mantener presionado en el encabezado */
+            user-select: none;
         }
 
-        /* La primera columna se ajusta para alinear el texto y el botón */
         th:first-child, td:first-child {
             text-align: left;
             padding-left: 10px;
@@ -196,7 +164,7 @@
             min-width: 110px;
             padding: 4px;
             border-radius: 4px;
-            user-select: auto; /* Permite escribir normalmente */
+            user-select: auto;
         }
 
         input[type="text"].editable-text:focus {
@@ -225,8 +193,8 @@
 
         /* --- BOTONES DE ELIMINAR (BLANCOS Y OCULTOS) --- */
         .btn-del {
-            display: none; /* Ocultos por defecto */
-            background: #ffffff; /* Blanco */
+            display: none;
+            background: #ffffff;
             color: #555;
             border: 1px solid #ddd;
             border-radius: 4px;
@@ -251,7 +219,6 @@
             color: #000;
         }
 
-        /* Clase que se activa al mantener presionado */
         .show-delete {
             display: inline-block !important;
         }
@@ -293,22 +260,63 @@
             margin-bottom: 3px;
         }
 
-        .actions {
+        /* --- SECCIÓN INFERIOR (CÓDIGO Y DESCARGA) --- */
+        .bottom-controls {
+            margin-top: 40px;
+            padding-top: 20px;
+            border-top: 1px solid var(--border-color);
             display: flex;
-            gap: 8px;
-            margin-bottom: 20px;
+            justify-content: center;
         }
 
-        .btn-action {
+        .export-group {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            width: 100%;
+            max-width: 450px;
+        }
+
+        .code-input {
+            padding: 12px 16px;
+            font-size: 14px;
             font-family: 'Inter', sans-serif;
-            font-size: 13px;
+            border: 2px solid var(--primary-color);
+            border-radius: 8px;
+            flex-grow: 1;
+            text-transform: uppercase;
+            text-align: center;
+        }
+
+        .code-input:focus {
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(217, 115, 115, 0.2);
+        }
+
+        .btn-primary {
+            background: var(--text-main);
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            font-size: 14px;
+            font-family: 'Inter', sans-serif;
             font-weight: 500;
-            padding: 8px 12px;
-            border-radius: 6px;
+            border-radius: 8px;
             cursor: pointer;
-            border: 1px solid #e0e0e0;
-            background: #ffffff;
-            color: #555;
+            white-space: nowrap;
+            transition: background 0.2s;
+        }
+
+        .btn-primary:hover {
+            background: #000;
+        }
+
+        h2 {
+            font-weight: 600;
+            font-size: 18px;
+            margin-top: 30px;
+            margin-bottom: 15px;
+            color: var(--text-main);
         }
 
         #servicios-section {
@@ -320,25 +328,25 @@
 
 <div class="container">
     
-    <!-- 1. CÓDIGO OBLIGATORIO Y DESCARGA -->
-    <div class="top-controls">
-        <h1>Registro de Inmueble</h1>
-        <div class="export-group">
-            <input type="text" id="codigoInput" class="code-input" placeholder="CÓDIGO OBLIGATORIO * (EJ: ENE120102)" required>
-            <button class="btn-primary" onclick="descargarExcel()">Descargar Excel</button>
-        </div>
-    </div>
+    <!-- TÍTULO -->
+    <div class="header-title">Registro de Inmueble</div>
 
-    <!-- 2. SELECCIÓN DE TIPO DE INMUEBLE -->
-    <div class="question-box" style="border-color: var(--primary-color); background: #fff5f5;">
+    <!-- 1. SELECCIÓN DE TIPO DE INMUEBLE (AHORA BLANCO Y LIMPIO) -->
+    <div class="question-box">
         <label>Tipo de Inmueble:</label>
         <div class="radio-group">
             <label><input type="radio" name="tipoInmueble" value="residencial" checked> Residencial</label>
             <label><input type="radio" name="tipoInmueble" value="comercial"> Comercial</label>
         </div>
     </div>
+
+    <!-- 2. BOTONES DE AGREGAR (AHORA ARRIBA DE LA TABLA) -->
+    <div class="actions-top">
+        <button class="btn-action" onclick="agregarFila()">+ Añadir Fila</button>
+        <button class="btn-action" onclick="agregarColumna()">+ Añadir Piso</button>
+    </div>
     
-    <!-- TABLA DEPENDENCIAS -->
+    <!-- 3. TABLA DEPENDENCIAS -->
     <div class="table-responsive">
         <table id="dependencias-table">
             <thead>
@@ -351,13 +359,8 @@
             </tbody>
         </table>
     </div>
-    
-    <div class="actions">
-        <button class="btn-action" onclick="agregarFila()">+ Añadir Fila</button>
-        <button class="btn-action" onclick="agregarColumna()">+ Añadir Piso</button>
-    </div>
 
-    <!-- PREGUNTA Y SERVICIOS -->
+    <!-- 4. PREGUNTA Y SERVICIOS -->
     <div class="question-box">
         <label>¿Tiene servicios comunales?</label>
         <div class="radio-group">
@@ -381,8 +384,16 @@
                 </tbody>
             </table>
         </div>
-        <div class="actions">
+        <div class="actions-top">
             <button class="btn-action" onclick="agregarServicio()">+ Añadir Servicio</button>
+        </div>
+    </div>
+
+    <!-- 5. CÓDIGO OBLIGATORIO Y DESCARGA (AHORA ABAJO DEL TODO) -->
+    <div class="bottom-controls">
+        <div class="export-group">
+            <input type="text" id="codigoInput" class="code-input" placeholder="CÓDIGO OBLIGATORIO * (EJ: ENE120102)" required>
+            <button class="btn-primary" onclick="descargarExcel()">Descargar Excel</button>
         </div>
     </div>
 
@@ -449,20 +460,16 @@
         headerRow.innerHTML = '<th>Dependencia / Pisos</th>';
         tbody.innerHTML = '';
 
-        // Crear encabezados de pisos
         for (let i = 1; i <= numPisos; i++) {
             const th = document.createElement('th');
-            // El botón de eliminar está oculto, aparece al mantener presionado el número
             th.innerHTML = `<span class="col-title">${i}</span> <button class="btn-del btn-del-col" onclick="eliminarColumna(this)">×</button>`;
             headerRow.appendChild(th);
         }
 
-        // Crear filas de dependencias
         currentDependencias.forEach(dep => {
             const tr = document.createElement('tr');
             
             const tdNombre = document.createElement('td');
-            // El botón de eliminar está oculto, aparece al mantener presionado el nombre
             tdNombre.innerHTML = `<input type="text" value="${dep}" class="editable-text"> <button class="btn-del" onclick="eliminarFila(this)">×</button>`;
             tr.appendChild(tdNombre);
 
@@ -549,7 +556,6 @@
     function eliminarFila(btn) {
         if (confirm("¿Estás seguro de que quieres eliminar esta fila?")) {
             btn.closest('tr').remove();
-            // Ocultar todos los botones activos
             document.querySelectorAll('.show-delete').forEach(el => el.classList.remove('show-delete'));
         }
     }
@@ -570,7 +576,6 @@
             
             numPisos--;
             
-            // Renumerar encabezados
             const remainingThs = document.querySelectorAll('#dependencias-header th');
             for (let i = 1; i < remainingThs.length; i++) {
                 remainingThs[i].querySelector('.col-title').textContent = i;
@@ -581,22 +586,17 @@
 
     // --- LÓGICA DE "MANTENER PRESIONADO" (LONG PRESS) ---
     let pressTimer;
-    const DELAY = 500; // 500ms de presión para que aparezca la X
+    const DELAY = 500; 
 
     function iniciarPresion(e, elementoABuscar, claseBoton) {
-        // Ignorar clics derechos o secundarios
         if (e.type === 'mousedown' && e.button !== 0) return;
-        
-        // Solo actuar si se presiona la celda o el encabezado
         const contenedor = e.target.closest(elementoABuscar);
         if (!contenedor) return;
 
         pressTimer = setTimeout(() => {
             const btn = contenedor.querySelector(claseBoton);
             if (btn) {
-                // Ocultar otros botones que estén visibles
                 document.querySelectorAll('.show-delete').forEach(el => el.classList.remove('show-delete'));
-                // Mostrar el botón de esta fila/columna
                 btn.classList.add('show-delete');
             }
         }, DELAY);
@@ -606,23 +606,19 @@
         clearTimeout(pressTimer);
     }
 
-    // Eventos para las filas (Dependencias)
     const tbody = document.getElementById('dependencias-body');
     tbody.addEventListener('mousedown', (e) => iniciarPresion(e, 'td:first-child', '.btn-del'));
     tbody.addEventListener('touchstart', (e) => iniciarPresion(e, 'td:first-child', '.btn-del'), {passive: true});
     
-    // Eventos para las columnas (Pisos)
     const thead = document.getElementById('dependencias-header');
     thead.addEventListener('mousedown', (e) => iniciarPresion(e, 'th:not(:first-child)', '.btn-del-col'));
     thead.addEventListener('touchstart', (e) => iniciarPresion(e, 'th:not(:first-child)', '.btn-del-col'), {passive: true});
 
-    // Cancelar al soltar el clic o el toque
     document.addEventListener('mouseup', cancelarPresion);
     document.addEventListener('touchend', cancelarPresion);
     document.addEventListener('mouseleave', cancelarPresion);
     document.addEventListener('touchcancel', cancelarPresion);
 
-    // Ocultar la X si se hace clic en cualquier otra parte de la pantalla
     document.addEventListener('click', (e) => {
         if (!e.target.classList.contains('btn-del')) {
             document.querySelectorAll('.show-delete').forEach(el => el.classList.remove('show-delete'));
