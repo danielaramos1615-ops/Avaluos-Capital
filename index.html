@@ -106,15 +106,16 @@
             border-color: #ccc;
         }
 
+        /* ¡AQUÍ ESTÁ EL BOTÓN ROJO! */
         .btn-danger {
-            color: #d9534f;
-            border-color: #d9534f;
-            background: #fff5f5;
+            color: #ffffff;
+            border: 1px solid #dc3545;
+            background: #dc3545;
         }
 
         .btn-danger:hover {
-            background: #d9534f;
-            color: white;
+            background: #c82333;
+            border-color: #bd2130;
         }
 
         /* --- DISEÑO DE LA TABLA --- */
@@ -138,6 +139,10 @@
             border-bottom: 1px solid var(--border-color);
             white-space: normal;
             word-break: break-word;
+            /* Evitar selección de texto al mantener presionado */
+            -webkit-user-select: none;
+            -ms-user-select: none;
+            user-select: none;
         }
 
         th {
@@ -145,7 +150,6 @@
             color: var(--text-muted);
             font-size: 13px;
             background-color: #ffffff;
-            user-select: none;
         }
 
         th:first-child, td:first-child {
@@ -165,6 +169,11 @@
             border-bottom: none;
         }
 
+        /* Modo Selección: Resalta las filas cuando está activo */
+        .selection-mode tr {
+            background-color: #fafafa;
+        }
+
         /* Input de texto editable */
         input[type="text"].editable-text {
             border: none;
@@ -176,8 +185,11 @@
             min-width: 80px;
             padding: 4px;
             border-radius: 4px;
-            user-select: auto;
             text-transform: uppercase;
+            /* Permitir selección de texto SOLO dentro del input */
+            -webkit-user-select: auto;
+            -ms-user-select: auto;
+            user-select: auto;
         }
 
         input[type="text"].editable-text:focus {
@@ -206,7 +218,7 @@
             border-color: var(--primary-color);
         }
 
-        /* --- CHECKBOX DE SELECCIÓN DE FILA (OCULTOS) --- */
+        /* --- CHECKBOX DE SELECCIÓN DE FILA --- */
         .row-selector {
             appearance: none;
             -webkit-appearance: none;
@@ -216,7 +228,7 @@
             border-radius: 4px;
             background-color: #fff;
             cursor: pointer;
-            display: none;
+            display: none; /* Ocultos por defecto */
             align-items: center;
             justify-content: center;
             flex-shrink: 0;
@@ -224,6 +236,7 @@
             transition: all 0.2s;
         }
 
+        /* Mostrar checkboxes cuando la tabla tenga la clase selection-mode */
         .selection-mode .row-selector {
             display: inline-flex;
         }
@@ -321,8 +334,8 @@
             gap: 10px;
             align-items: center;
             width: 100%;
-            max-width: 600px; /* Más ancho para que quepan los dos botones */
-            flex-wrap: wrap; /* Para que bajen si la pantalla es muy pequeña */
+            max-width: 600px;
+            flex-wrap: wrap;
             justify-content: center;
         }
 
@@ -401,7 +414,7 @@
     <div class="actions-top">
         <button class="btn-action" onclick="agregarFila()">+ Añadir Fila</button>
         <button class="btn-action" onclick="agregarColumna()">+ Añadir Piso</button>
-        <button class="btn-action btn-danger" onclick="eliminarSeleccionadasDependencias()">🗑️ Eliminar Seleccionadas</button>
+        <button class="btn-action btn-danger" onclick="prepararEliminacionDependencias()">🗑️ Eliminar Seleccionadas</button>
     </div>
     
     <!-- TABLA DEPENDENCIAS -->
@@ -452,7 +465,7 @@
         </div>
         <div class="actions-top">
             <button class="btn-action" onclick="agregarServicio()">+ Añadir Servicio</button>
-            <button class="btn-action btn-danger" onclick="eliminarSeleccionadasServicios()">🗑️ Eliminar Seleccionados</button>
+            <button class="btn-action btn-danger" onclick="prepararEliminacionServicios()">🗑️ Eliminar Seleccionados</button>
         </div>
     </div>
 
@@ -642,29 +655,46 @@
         checkboxes.forEach(cb => cb.checked = source.checked);
     }
 
-    function eliminarSeleccionadasDependencias() {
+    // NUEVA FUNCIÓN: Verifica si el modo selección está activo antes de eliminar
+    function prepararEliminacionDependencias() {
+        const tbody = document.getElementById('dependencias-body');
+        if (!tbody.classList.contains('selection-mode')) {
+            if (confirm("Para eliminar, primero debes seleccionar las filas.\n\n¿Quieres activar el modo de selección ahora?")) {
+                tbody.classList.add('selection-mode');
+            }
+            return;
+        }
+        
         const seleccionadas = document.querySelectorAll('.row-dep-check:checked');
         if (seleccionadas.length === 0) {
-            alert("No has seleccionado ninguna dependencia para eliminar.");
+            alert("No has marcado ninguna dependencia para eliminar.");
             return;
         }
         if (confirm(`¿Estás seguro de que quieres eliminar ${seleccionadas.length} dependencia(s)?`)) {
             seleccionadas.forEach(cb => cb.closest('tr').remove());
             document.getElementById('select-all-dep').checked = false;
-            document.getElementById('dependencias-body').classList.remove('selection-mode');
+            tbody.classList.remove('selection-mode');
         }
     }
 
-    function eliminarSeleccionadasServicios() {
+    function prepararEliminacionServicios() {
+        const tbody = document.getElementById('servicios-body');
+        if (!tbody.classList.contains('selection-mode')) {
+            if (confirm("Para eliminar, primero debes seleccionar las filas.\n\n¿Quieres activar el modo de selección ahora?")) {
+                tbody.classList.add('selection-mode');
+            }
+            return;
+        }
+
         const seleccionadas = document.querySelectorAll('.row-serv-check:checked');
         if (seleccionadas.length === 0) {
-            alert("No has seleccionado ningún servicio para eliminar.");
+            alert("No has marcado ningún servicio para eliminar.");
             return;
         }
         if (confirm(`¿Estás seguro de que quieres eliminar ${seleccionadas.length} servicio(s)?`)) {
             seleccionadas.forEach(cb => cb.closest('tr').remove());
             document.getElementById('select-all-serv').checked = false;
-            document.getElementById('servicios-body').classList.remove('selection-mode');
+            tbody.classList.remove('selection-mode');
         }
     }
 
@@ -699,7 +729,8 @@
 
     function iniciarPresion(e, tipo) {
         if (e.type === 'mousedown' && e.button !== 0) return;
-        if (e.target.classList.contains('row-selector') || e.target.classList.contains('editable-text')) return;
+        // Si hace clic en un checkbox o en un botón, no activar long press
+        if (e.target.classList.contains('row-selector') || e.target.tagName === 'BUTTON') return;
 
         if (tipo === 'columna') {
             const contenedor = e.target.closest('th:not(:first-child)');
@@ -712,7 +743,7 @@
                 }
             }, DELAY);
         } else if (tipo === 'fila') {
-            const contenedor = e.target.closest('td:first-child');
+            const contenedor = e.target.closest('tr'); // Detectar presión en cualquier parte de la fila
             if (!contenedor) return;
             const tbody = contenedor.closest('tbody');
             pressTimer = setTimeout(() => {
@@ -728,6 +759,13 @@
         clearTimeout(pressTimer);
     }
 
+    // Prevenir el menú de copiar/pegar nativo en las tablas para que no interrumpa el long press
+    document.addEventListener('contextmenu', function(e) {
+        if (e.target.closest('td') || e.target.closest('th')) {
+            e.preventDefault();
+        }
+    });
+
     const thead = document.getElementById('dependencias-header');
     thead.addEventListener('mousedown', (e) => iniciarPresion(e, 'columna'));
     thead.addEventListener('touchstart', (e) => iniciarPresion(e, 'columna'), {passive: true});
@@ -742,15 +780,12 @@
 
     document.addEventListener('mouseup', cancelarPresion);
     document.addEventListener('touchend', cancelarPresion);
-    document.addEventListener('mouseleave', cancelarPresion);
+    document.addEventListener('touchmove', cancelarPresion); // Cancelar si el usuario desliza (scroll)
     document.addEventListener('touchcancel', cancelarPresion);
 
     document.addEventListener('click', (e) => {
-        if (!e.target.classList.contains('btn-del-col')) {
+        if (!e.target.classList.contains('btn-del-col') && !e.target.classList.contains('btn-danger')) {
             document.querySelectorAll('.show-delete').forEach(el => el.classList.remove('show-delete'));
-        }
-        if (!e.target.closest('table') || e.target.classList.contains('btn-danger')) {
-            document.querySelectorAll('.selection-mode').forEach(el => el.classList.remove('selection-mode'));
         }
     });
 
@@ -789,7 +824,7 @@
         }
     });
 
-    // --- VALIDACIÓN DE CÓDIGO (REUTILIZABLE) ---
+    // --- VALIDACIÓN DE CÓDIGO ---
     function validarCodigo() {
         const codigoInput = document.getElementById('codigoInput');
         const codigo = codigoInput.value.trim().toUpperCase();
@@ -863,17 +898,14 @@
         const codigo = validarCodigo();
         if (!codigo) return;
 
-        // Inicializar jsPDF en modo horizontal (landscape) para que quepan las columnas
         const { jsPDF } = window.jspdf;
         const doc = new jsPDF('landscape');
 
-        // Título del documento
         doc.setFontSize(16);
         doc.text(`REGISTRO DE INMUEBLE`, 14, 15);
         doc.setFontSize(11);
         doc.text(`Código: ${codigo}`, 14, 22);
 
-        // Preparar datos de Dependencias
         const headersDep = ["DEPENDENCIA / PISOS"];
         document.querySelectorAll('#dependencias-header th').forEach((th, index) => {
             if (index > 0) headersDep.push(th.querySelector('.col-title').textContent.trim());
@@ -884,22 +916,20 @@
             const row = [];
             row.push(tr.querySelector('input[type="text"]').value);
             tr.querySelectorAll('.cell-number-input').forEach(input => {
-                row.push(input.value || '-'); // Guion si está vacío
+                row.push(input.value || '-');
             });
             bodyDep.push(row);
         });
 
-        // Generar tabla de Dependencias
         doc.autoTable({
             startY: 30,
             head: [headersDep],
             body: bodyDep,
             theme: 'grid',
-            headStyles: { fillColor: [217, 115, 115] }, // Color rosa suave
+            headStyles: { fillColor: [217, 115, 115] },
             styles: { fontSize: 8, cellPadding: 2 }
         });
 
-        // Verificar si hay servicios comunales
         const tieneServicios = document.querySelector('input[name="tieneServicios"]:checked').value === 'si';
         if (tieneServicios) {
             const bodyServ = [];
@@ -910,8 +940,6 @@
             });
 
             let finalY = doc.lastAutoTable.finalY + 15;
-            
-            // Si no cabe en la página actual, añadir nueva página
             if (finalY > 180) {
                 doc.addPage();
                 finalY = 20;
@@ -930,7 +958,6 @@
             });
         }
 
-        // Descargar PDF
         doc.save(`Registro_Inmueble_${codigo}.pdf`);
     }
 
