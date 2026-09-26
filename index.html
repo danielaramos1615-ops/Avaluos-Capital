@@ -106,7 +106,7 @@
             border-color: #ccc;
         }
 
-        /* Estilo del botón de eliminar (Rosa suave) */
+        /* Estilo del botón de eliminar */
         .btn-danger {
             color: #d9534f;
             border-color: #d9534f;
@@ -118,7 +118,6 @@
             color: white;
         }
 
-        /* Clase para ocultar el botón por defecto */
         .hidden-btn {
             display: none !important;
         }
@@ -173,6 +172,7 @@
             border-bottom: none;
         }
 
+        /* Modo Selección: Se aplica a la tabla completa */
         .selection-mode tr {
             background-color: #fafafa;
         }
@@ -220,7 +220,7 @@
             border-color: var(--primary-color);
         }
 
-        /* --- CHECKBOX DE SELECCIÓN DE FILA --- */
+        /* --- CHECKBOX DE SELECCIÓN (FILAS Y CABECERA) --- */
         .row-selector {
             appearance: none;
             -webkit-appearance: none;
@@ -238,7 +238,7 @@
             transition: all 0.2s;
         }
 
-        /* Mostrar checkboxes cuando la tabla tenga la clase selection-mode */
+        /* Mostrar checkboxes cuando la TABLA tenga la clase selection-mode */
         .selection-mode .row-selector {
             display: inline-flex;
         }
@@ -416,7 +416,6 @@
     <div class="actions-top">
         <button class="btn-action" onclick="agregarFila()">+ Añadir Fila</button>
         <button class="btn-action" onclick="agregarColumna()">+ Añadir Piso</button>
-        <!-- Botón de eliminar oculto por defecto (SIN EMOJI) -->
         <button class="btn-action btn-danger hidden-btn" id="btn-eliminar-dep" onclick="prepararEliminacionDependencias()">Eliminar Seleccionadas</button>
     </div>
     
@@ -427,7 +426,7 @@
                 <tr id="dependencias-header">
                     <th>
                         <div style="display:flex; align-items:center; gap:5px;">
-                            <!-- Checkbox de Seleccionar Todo -->
+                            <!-- Checkbox de Seleccionar Todo (en la cabecera) -->
                             <input type="checkbox" class="row-selector" id="select-all-dep" onclick="toggleSelectAllDep(this)" title="Seleccionar Todo">
                             <span>Dependencia / Pisos</span>
                         </div>
@@ -456,7 +455,7 @@
                     <tr>
                         <th>
                             <div style="display:flex; align-items:center; gap:5px;">
-                                <!-- Checkbox de Seleccionar Todo -->
+                                <!-- Checkbox de Seleccionar Todo (en la cabecera) -->
                                 <input type="checkbox" class="row-selector" id="select-all-serv" onclick="toggleSelectAllServ(this)" title="Seleccionar Todo">
                                 <span>Servicio</span>
                             </div>
@@ -470,7 +469,6 @@
         </div>
         <div class="actions-top">
             <button class="btn-action" onclick="agregarServicio()">+ Añadir Servicio</button>
-            <!-- Botón de eliminar oculto por defecto (SIN EMOJI) -->
             <button class="btn-action btn-danger hidden-btn" id="btn-eliminar-serv" onclick="prepararEliminacionServicios()">Eliminar Seleccionados</button>
         </div>
     </div>
@@ -545,6 +543,7 @@
         const headerRow = document.getElementById('dependencias-header');
         const tbody = document.getElementById('dependencias-body');
 
+        // Nota: El checkbox de la cabecera ahora también tiene la clase 'row-selector'
         headerRow.innerHTML = `
             <th>
                 <div style="display:flex; align-items:center; gap:5px;">
@@ -654,20 +653,21 @@
     function actualizarVisibilidadBotones(tipo) {
         if (tipo === 'dep') {
             const btn = document.getElementById('btn-eliminar-dep');
-            const tbody = document.getElementById('dependencias-body');
-            const checkboxes = tbody.querySelectorAll('.row-dep-check:checked');
+            const table = document.getElementById('dependencias-table');
+            const checkboxes = document.querySelectorAll('.row-dep-check:checked');
             
-            if (tbody.classList.contains('selection-mode') || checkboxes.length > 0) {
+            // Mostrar si la tabla tiene la clase selection-mode O si hay checkboxes marcados
+            if (table.classList.contains('selection-mode') || checkboxes.length > 0) {
                 btn.classList.remove('hidden-btn');
             } else {
                 btn.classList.add('hidden-btn');
             }
         } else if (tipo === 'serv') {
             const btn = document.getElementById('btn-eliminar-serv');
-            const tbody = document.getElementById('servicios-body');
-            const checkboxes = tbody.querySelectorAll('.row-serv-check:checked');
+            const table = document.getElementById('servicios-table');
+            const checkboxes = document.querySelectorAll('.row-serv-check:checked');
             
-            if (tbody.classList.contains('selection-mode') || checkboxes.length > 0) {
+            if (table.classList.contains('selection-mode') || checkboxes.length > 0) {
                 btn.classList.remove('hidden-btn');
             } else {
                 btn.classList.add('hidden-btn');
@@ -697,7 +697,7 @@
         if (confirm(`¿Estás seguro de que quieres eliminar ${seleccionadas.length} dependencia(s)?`)) {
             seleccionadas.forEach(cb => cb.closest('tr').remove());
             document.getElementById('select-all-dep').checked = false;
-            document.getElementById('dependencias-body').classList.remove('selection-mode');
+            document.getElementById('dependencias-table').classList.remove('selection-mode');
             actualizarVisibilidadBotones('dep');
         }
     }
@@ -711,7 +711,7 @@
         if (confirm(`¿Estás seguro de que quieres eliminar ${seleccionadas.length} servicio(s)?`)) {
             seleccionadas.forEach(cb => cb.closest('tr').remove());
             document.getElementById('select-all-serv').checked = false;
-            document.getElementById('servicios-body').classList.remove('selection-mode');
+            document.getElementById('servicios-table').classList.remove('selection-mode');
             actualizarVisibilidadBotones('serv');
         }
     }
@@ -762,13 +762,17 @@
         } else if (tipo === 'fila') {
             const contenedor = e.target.closest('tr');
             if (!contenedor) return;
-            const tbody = contenedor.closest('tbody');
+            // Buscamos la tabla completa, no solo el tbody
+            const table = contenedor.closest('table'); 
+            
             pressTimer = setTimeout(() => {
-                document.querySelectorAll('tbody').forEach(tb => {
-                    if (tb !== tbody) tb.classList.remove('selection-mode');
+                // Quitar modo selección de la otra tabla si está activa
+                document.querySelectorAll('table').forEach(tb => {
+                    if (tb !== table) tb.classList.remove('selection-mode');
                 });
-                tbody.classList.add('selection-mode');
-                actualizarVisibilidadBotones(tbody.id === 'dependencias-body' ? 'dep' : 'serv');
+                // Activar modo selección en esta tabla
+                table.classList.add('selection-mode');
+                actualizarVisibilidadBotones(table.id === 'dependencias-table' ? 'dep' : 'serv');
             }, DELAY);
         }
     }
@@ -816,7 +820,7 @@
             document.querySelectorAll('.show-delete').forEach(el => el.classList.remove('show-delete'));
         }
         if (!e.target.closest('table') && !e.target.closest('.btn-danger')) {
-            document.querySelectorAll('.selection-mode').forEach(el => el.classList.remove('selection-mode'));
+            document.querySelectorAll('table').forEach(tb => tb.classList.remove('selection-mode'));
             actualizarVisibilidadBotones('dep');
             actualizarVisibilidadBotones('serv');
         }
