@@ -13,7 +13,6 @@
             --text-muted: #888888;
             --border-color: #eeeeee;
             --bg-color: #fcfcfc;
-            --danger-color: #ff6b6b;
         }
 
         body {
@@ -166,12 +165,21 @@
             color: var(--text-muted);
             font-size: 13px;
             background-color: #ffffff;
+            user-select: none; /* Evita seleccionar texto al mantener presionado en el encabezado */
         }
 
+        /* La primera columna se ajusta para alinear el texto y el botón */
         th:first-child, td:first-child {
             text-align: left;
             padding-left: 10px;
             width: 1%;
+        }
+        
+        td:first-child {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 5px;
         }
 
         tbody tr:last-child td {
@@ -188,6 +196,7 @@
             min-width: 110px;
             padding: 4px;
             border-radius: 4px;
+            user-select: auto; /* Permite escribir normalmente */
         }
 
         input[type="text"].editable-text:focus {
@@ -214,29 +223,37 @@
             border-color: var(--primary-color);
         }
 
-        /* --- BOTONES DE ELIMINAR --- */
-        .btn-del-row, .btn-del-col {
-            background: #ffe5e5;
-            color: var(--danger-color);
-            border: none;
+        /* --- BOTONES DE ELIMINAR (BLANCOS Y OCULTOS) --- */
+        .btn-del {
+            display: none; /* Ocultos por defecto */
+            background: #ffffff; /* Blanco */
+            color: #555;
+            border: 1px solid #ddd;
             border-radius: 4px;
             cursor: pointer;
             font-size: 12px;
-            font-weight: bold;
+            font-weight: 600;
             padding: 2px 6px;
-            margin-left: 5px;
             transition: all 0.2s;
+            margin-left: 5px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
         }
         
         .btn-del-col {
             margin-left: 6px;
-            padding: 0px 5px;
+            padding: 1px 5px;
             font-size: 11px;
         }
 
-        .btn-del-row:hover, .btn-del-col:hover {
-            background: var(--danger-color);
-            color: white;
+        .btn-del:hover {
+            background: #f5f5f5;
+            border-color: #ccc;
+            color: #000;
+        }
+
+        /* Clase que se activa al mantener presionado */
+        .show-delete {
+            display: inline-block !important;
         }
 
         /* --- CHECKBOXES --- */
@@ -403,9 +420,9 @@
 
     // --- VARIABLES DE ESTADO ---
     let numPisos = 5; 
-    let currentDependencias = dependenciasResidenciales; // Por defecto residencial
+    let currentDependencias = dependenciasResidenciales; 
 
-    // --- FUNCIONES DE CREACIÓN DE ELEMENTOS ---
+    // --- FUNCIONES DE CREACIÓN ---
     function crearInputNumero() {
         const input = document.createElement('input');
         input.type = 'text';
@@ -424,19 +441,19 @@
         return wrapper;
     }
 
-    // --- RENDERIZADO DE LA TABLA DE DEPENDENCIAS ---
+    // --- RENDERIZADO DE LA TABLA ---
     function renderizarTablaDependencias() {
         const headerRow = document.getElementById('dependencias-header');
         const tbody = document.getElementById('dependencias-body');
 
-        // Limpiar tabla existente
         headerRow.innerHTML = '<th>Dependencia / Pisos</th>';
         tbody.innerHTML = '';
 
-        // Crear encabezados de pisos con botón de eliminar
+        // Crear encabezados de pisos
         for (let i = 1; i <= numPisos; i++) {
             const th = document.createElement('th');
-            th.innerHTML = `${i} <button class="btn-del-col" onclick="eliminarColumna(this)">×</button>`;
+            // El botón de eliminar está oculto, aparece al mantener presionado el número
+            th.innerHTML = `<span class="col-title">${i}</span> <button class="btn-del btn-del-col" onclick="eliminarColumna(this)">×</button>`;
             headerRow.appendChild(th);
         }
 
@@ -444,12 +461,11 @@
         currentDependencias.forEach(dep => {
             const tr = document.createElement('tr');
             
-            // Columna de nombre con botón de eliminar
             const tdNombre = document.createElement('td');
-            tdNombre.innerHTML = `<input type="text" value="${dep}" class="editable-text"> <button class="btn-del-row" onclick="eliminarFila(this)">×</button>`;
+            // El botón de eliminar está oculto, aparece al mantener presionado el nombre
+            tdNombre.innerHTML = `<input type="text" value="${dep}" class="editable-text"> <button class="btn-del" onclick="eliminarFila(this)">×</button>`;
             tr.appendChild(tdNombre);
 
-            // Columnas de inputs numéricos
             for (let i = 1; i <= numPisos; i++) {
                 const td = document.createElement('td');
                 td.appendChild(crearInputNumero());
@@ -496,7 +512,7 @@
         const tr = document.createElement('tr');
         
         const tdNombre = document.createElement('td');
-        tdNombre.innerHTML = `<input type="text" placeholder="Nueva dependencia" class="editable-text"> <button class="btn-del-row" onclick="eliminarFila(this)">×</button>`;
+        tdNombre.innerHTML = `<input type="text" placeholder="Nueva dependencia" class="editable-text"> <button class="btn-del" onclick="eliminarFila(this)">×</button>`;
         tr.appendChild(tdNombre);
 
         for (let i = 0; i < totalColumnas; i++) {
@@ -510,14 +526,12 @@
     function agregarColumna() {
         const headerRow = document.getElementById('dependencias-header');
         const tbody = document.getElementById('dependencias-body');
-        const newColNum = headerRow.children.length; // El número de columnas actuales + 1
+        const newColNum = headerRow.children.length; 
 
-        // Agregar encabezado con botón de eliminar
         const th = document.createElement('th');
-        th.innerHTML = `${newColNum} <button class="btn-del-col" onclick="eliminarColumna(this)">×</button>`;
+        th.innerHTML = `<span class="col-title">${newColNum}</span> <button class="btn-del btn-del-col" onclick="eliminarColumna(this)">×</button>`;
         headerRow.appendChild(th);
 
-        // Agregar celda a cada fila
         const filas = tbody.querySelectorAll('tr');
         filas.forEach(tr => {
             const td = document.createElement('td');
@@ -535,6 +549,8 @@
     function eliminarFila(btn) {
         if (confirm("¿Estás seguro de que quieres eliminar esta fila?")) {
             btn.closest('tr').remove();
+            // Ocultar todos los botones activos
+            document.querySelectorAll('.show-delete').forEach(el => el.classList.remove('show-delete'));
         }
     }
 
@@ -543,10 +559,8 @@
             const th = btn.parentElement;
             const index = Array.from(th.parentElement.children).indexOf(th);
             
-            // Eliminar encabezado
             th.remove();
             
-            // Eliminar celdas de todas las filas
             const rows = document.querySelectorAll('#dependencias-body tr');
             rows.forEach(row => {
                 if (row.cells[index]) {
@@ -556,13 +570,64 @@
             
             numPisos--;
             
-            // Renumerar encabezados restantes
+            // Renumerar encabezados
             const remainingThs = document.querySelectorAll('#dependencias-header th');
             for (let i = 1; i < remainingThs.length; i++) {
-                remainingThs[i].innerHTML = `${i} <button class="btn-del-col" onclick="eliminarColumna(this)">×</button>`;
+                remainingThs[i].querySelector('.col-title').textContent = i;
             }
+            document.querySelectorAll('.show-delete').forEach(el => el.classList.remove('show-delete'));
         }
     }
+
+    // --- LÓGICA DE "MANTENER PRESIONADO" (LONG PRESS) ---
+    let pressTimer;
+    const DELAY = 500; // 500ms de presión para que aparezca la X
+
+    function iniciarPresion(e, elementoABuscar, claseBoton) {
+        // Ignorar clics derechos o secundarios
+        if (e.type === 'mousedown' && e.button !== 0) return;
+        
+        // Solo actuar si se presiona la celda o el encabezado
+        const contenedor = e.target.closest(elementoABuscar);
+        if (!contenedor) return;
+
+        pressTimer = setTimeout(() => {
+            const btn = contenedor.querySelector(claseBoton);
+            if (btn) {
+                // Ocultar otros botones que estén visibles
+                document.querySelectorAll('.show-delete').forEach(el => el.classList.remove('show-delete'));
+                // Mostrar el botón de esta fila/columna
+                btn.classList.add('show-delete');
+            }
+        }, DELAY);
+    }
+
+    function cancelarPresion() {
+        clearTimeout(pressTimer);
+    }
+
+    // Eventos para las filas (Dependencias)
+    const tbody = document.getElementById('dependencias-body');
+    tbody.addEventListener('mousedown', (e) => iniciarPresion(e, 'td:first-child', '.btn-del'));
+    tbody.addEventListener('touchstart', (e) => iniciarPresion(e, 'td:first-child', '.btn-del'), {passive: true});
+    
+    // Eventos para las columnas (Pisos)
+    const thead = document.getElementById('dependencias-header');
+    thead.addEventListener('mousedown', (e) => iniciarPresion(e, 'th:not(:first-child)', '.btn-del-col'));
+    thead.addEventListener('touchstart', (e) => iniciarPresion(e, 'th:not(:first-child)', '.btn-del-col'), {passive: true});
+
+    // Cancelar al soltar el clic o el toque
+    document.addEventListener('mouseup', cancelarPresion);
+    document.addEventListener('touchend', cancelarPresion);
+    document.addEventListener('mouseleave', cancelarPresion);
+    document.addEventListener('touchcancel', cancelarPresion);
+
+    // Ocultar la X si se hace clic en cualquier otra parte de la pantalla
+    document.addEventListener('click', (e) => {
+        if (!e.target.classList.contains('btn-del')) {
+            document.querySelectorAll('.show-delete').forEach(el => el.classList.remove('show-delete'));
+        }
+    });
 
     // --- LÓGICA DE TIPO DE INMUEBLE ---
     document.querySelectorAll('input[name="tipoInmueble"]').forEach(radio => {
@@ -572,7 +637,7 @@
             } else {
                 currentDependencias = dependenciasComerciales;
             }
-            numPisos = 5; // Reiniciar a 5 pisos por defecto al cambiar
+            numPisos = 5; 
             renderizarTablaDependencias();
         });
     });
@@ -609,27 +674,22 @@
 
         const wb = XLSX.utils.book_new();
 
-        // --- Hoja 1: Dependencias ---
         const datosDependencias = [];
         const headersDep = [];
         
-        // Extraer encabezados (Ignorando el botón de eliminar)
         document.querySelectorAll('#dependencias-header th').forEach((th, index) => {
             if (index === 0) {
                 headersDep.push("Dependencia / Pisos");
             } else {
-                headersDep.push(th.childNodes[0].textContent.trim());
+                headersDep.push(th.querySelector('.col-title').textContent.trim());
             }
         });
         datosDependencias.push(headersDep);
 
-        // Extraer filas
         document.querySelectorAll('#dependencias-body tr').forEach(tr => {
             const filaData = [];
-            // Extraer el nombre de la dependencia (primer input de texto)
             filaData.push(tr.querySelector('input[type="text"]').value);
             
-            // Extraer los valores de los inputs numéricos
             tr.querySelectorAll('.cell-number-input').forEach(input => {
                 filaData.push(input.value);
             });
@@ -639,7 +699,6 @@
         const wsDep = XLSX.utils.aoa_to_sheet(datosDependencias);
         XLSX.utils.book_append_sheet(wb, wsDep, "Dependencias");
 
-        // --- Hoja 2: Servicios Comunales ---
         const tieneServicios = document.querySelector('input[name="tieneServicios"]:checked').value === 'si';
         
         if (tieneServicios) {
