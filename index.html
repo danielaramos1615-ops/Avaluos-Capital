@@ -59,6 +59,7 @@
             margin-bottom: 20px;
             width: fit-content;
             box-shadow: 0 2px 5px rgba(0,0,0,0.02);
+            flex-wrap: wrap;
         }
 
         .question-box label {
@@ -69,6 +70,7 @@
         .radio-group {
             display: flex;
             gap: 15px;
+            flex-wrap: wrap;
         }
 
         .radio-group label {
@@ -409,6 +411,7 @@
         <div class="radio-group">
             <label><input type="radio" name="tipoInmueble" value="residencial" checked> Residencial</label>
             <label><input type="radio" name="tipoInmueble" value="comercial"> Comercial</label>
+            <label><input type="radio" name="tipoInmueble" value="mixto"> Mixto</label>
         </div>
     </div>
 
@@ -503,6 +506,13 @@
         "CUARTO TÉCNICO DE MECÁNICA", "CUARTO DE MÁQUINAS",
         "CUARTO DE MÁQUINAS DE ASCENSORES", "TANQUES DE AGUA", "TERRAZA", "BALCÓN"
     ];
+
+    // Combinación de residencial + comercial, sin duplicados
+    // (BODEGA, BAÑO DE SERVICIO y BALCÓN aparecen en ambos y se cuentan una sola vez)
+    const dependenciasMixtas = [...new Set([
+        ...dependenciasResidenciales,
+        ...dependenciasComerciales
+    ])];
 
     const serviciosIniciales = [
         "LOBBY", "RECEPCIÓN", "SALÓN SOCIAL", "ZONAS VERDES", "ADMINISTRACIÓN",
@@ -826,13 +836,19 @@
         }
     });
 
-    // --- LÓGICA DE TIPO DE INMUEBLE ---
+    // --- LÓGICA DE TIPO DE INMUEBLE (Residencial / Comercial / Mixto) ---
     document.querySelectorAll('input[name="tipoInmueble"]').forEach(radio => {
         radio.addEventListener('change', (e) => {
-            if (e.target.value === 'residencial') {
-                currentDependencias = dependenciasResidenciales;
-            } else {
-                currentDependencias = dependenciasComerciales;
+            switch (e.target.value) {
+                case 'residencial':
+                    currentDependencias = dependenciasResidenciales;
+                    break;
+                case 'comercial':
+                    currentDependencias = dependenciasComerciales;
+                    break;
+                case 'mixto':
+                    currentDependencias = dependenciasMixtas;
+                    break;
             }
             numPisos = 5; 
             renderizarTablaDependencias();
@@ -932,98 +948,99 @@
         XLSX.writeFile(wb, `Registro_Inmueble_${codigo}.xlsx`);
     }
 
-    // --- EXPORTACIÓN A PDF (Versión corregida) ---
-function descargarPDF() {
-    const codigo = validarCodigo();
-    if (!codigo) return;
+    // --- EXPORTACIÓN A PDF ---
+    function descargarPDF() {
+        const codigo = validarCodigo();
+        if (!codigo) return;
 
-    const { jsPDF } = window.jspdf;
-    const doc = new jsPDF('landscape');
+        const { jsPDF } = window.jspdf;
+        const doc = new jsPDF('landscape');
 
-    doc.setFontSize(16);
-    doc.text(`REGISTRO DE INMUEBLE`, 14, 15);
-    doc.setFontSize(11);
-    doc.text(`Código: ${codigo}`, 14, 22);
+        doc.setFontSize(16);
+        doc.text(`REGISTRO DE INMUEBLE`, 14, 15);
+        doc.setFontSize(11);
+        doc.text(`Código: ${codigo}`, 14, 22);
 
-    const headersDep = ["DEPENDENCIA / PISOS"];
-    document.querySelectorAll('#dependencias-header th').forEach((th, index) => {
-        if (index > 0) headersDep.push(th.querySelector('.col-title').textContent.trim());
-    });
-
-    const bodyDep = [];
-    document.querySelectorAll('#dependencias-body tr').forEach(tr => {
-        const row = [];
-        row.push(tr.querySelector('input[type="text"]').value);
-        tr.querySelectorAll('.cell-number-input').forEach(input => {
-            row.push(input.value || '-');
-        });
-        bodyDep.push(row);
-    });
-
-    // --- CONFIGURACIÓN DE ESTILO DE LA TABLA EN EL PDF ---
-    doc.autoTable({
-        startY: 30,
-        head: [headersDep],
-        body: bodyDep,
-        theme: 'plain', // Quitamos la cuadrícula negra
-        headStyles: { 
-            fillColor: [255, 255, 255], // Fondo blanco (en lugar del rojo feo)
-            textColor: [136, 136, 136], // Texto gris suave (--text-muted)
-            fontStyle: 'bold',
-            lineWidth: { bottom: 0.5 }, // Solo línea inferior
-            lineColor: [238, 238, 238] // Color gris claro (--border-color)
-        },
-        styles: { 
-            fontSize: 9, 
-            cellPadding: 4,
-            textColor: [51, 51, 51], // Texto principal oscuro (--text-main)
-            lineWidth: { bottom: 0.1 }, // Solo líneas horizontales
-            lineColor: [238, 238, 238] // Gris claro
-        }
-    });
-
-    const tieneServicios = document.querySelector('input[name="tieneServicios"]:checked').value === 'si';
-    if (tieneServicios) {
-        const bodyServ = [];
-        document.querySelectorAll('#servicios-body tr').forEach(tr => {
-            const nombre = tr.querySelector('input[type="text"]').value;
-            const marcado = tr.querySelector('.service-check').checked ? 'X' : '';
-            bodyServ.push([nombre, marcado]);
+        const headersDep = ["DEPENDENCIA / PISOS"];
+        document.querySelectorAll('#dependencias-header th').forEach((th, index) => {
+            if (index > 0) headersDep.push(th.querySelector('.col-title').textContent.trim());
         });
 
-        let finalY = doc.lastAutoTable.finalY + 15;
-        if (finalY > 180) {
-            doc.addPage();
-            finalY = 20;
-        }
+        const bodyDep = [];
+        document.querySelectorAll('#dependencias-body tr').forEach(tr => {
+            const row = [];
+            row.push(tr.querySelector('input[type="text"]').value);
+            tr.querySelectorAll('.cell-number-input').forEach(input => {
+                row.push(input.value || '-');
+            });
+            bodyDep.push(row);
+        });
 
-        doc.setFontSize(12);
-        doc.text("SERVICIOS COMUNALES", 14, finalY);
-
+        // --- CONFIGURACIÓN DE ESTILO DE LA TABLA EN EL PDF ---
         doc.autoTable({
-            startY: finalY + 5,
-            head: [["SERVICIO", "INCLUIDO"]],
-            body: bodyServ,
-            theme: 'plain',
+            startY: 30,
+            head: [headersDep],
+            body: bodyDep,
+            theme: 'plain', // Quitamos la cuadrícula negra
             headStyles: { 
-                fillColor: [255, 255, 255], 
-                textColor: [136, 136, 136], 
+                fillColor: [255, 255, 255], // Fondo blanco (en lugar del rojo feo)
+                textColor: [136, 136, 136], // Texto gris suave (--text-muted)
                 fontStyle: 'bold',
-                lineWidth: { bottom: 0.5 },
-                lineColor: [238, 238, 238]
+                lineWidth: { bottom: 0.5 }, // Solo línea inferior
+                lineColor: [238, 238, 238] // Color gris claro (--border-color)
             },
             styles: { 
                 fontSize: 9, 
-                cellPadding: 4, 
-                textColor: [51, 51, 51],
-                lineWidth: { bottom: 0.1 },
-                lineColor: [238, 238, 238]
+                cellPadding: 4,
+                textColor: [51, 51, 51], // Texto principal oscuro (--text-main)
+                lineWidth: { bottom: 0.1 }, // Solo líneas horizontales
+                lineColor: [238, 238, 238] // Gris claro
             }
         });
+
+        const tieneServicios = document.querySelector('input[name="tieneServicios"]:checked').value === 'si';
+        if (tieneServicios) {
+            const bodyServ = [];
+            document.querySelectorAll('#servicios-body tr').forEach(tr => {
+                const nombre = tr.querySelector('input[type="text"]').value;
+                const marcado = tr.querySelector('.service-check').checked ? 'X' : '';
+                bodyServ.push([nombre, marcado]);
+            });
+
+            let finalY = doc.lastAutoTable.finalY + 15;
+            if (finalY > 180) {
+                doc.addPage();
+                finalY = 20;
+            }
+
+            doc.setFontSize(12);
+            doc.text("SERVICIOS COMUNALES", 14, finalY);
+
+            doc.autoTable({
+                startY: finalY + 5,
+                head: [["SERVICIO", "INCLUIDO"]],
+                body: bodyServ,
+                theme: 'plain',
+                headStyles: { 
+                    fillColor: [255, 255, 255], 
+                    textColor: [136, 136, 136], 
+                    fontStyle: 'bold',
+                    lineWidth: { bottom: 0.5 },
+                    lineColor: [238, 238, 238]
+                },
+                styles: { 
+                    fontSize: 9, 
+                    cellPadding: 4, 
+                    textColor: [51, 51, 51],
+                    lineWidth: { bottom: 0.1 },
+                    lineColor: [238, 238, 238]
+                }
+            });
+        }
+
+        doc.save(`Registro_Inmueble_${codigo}.pdf`);
     }
 
-    doc.save(`Registro_Inmueble_${codigo}.pdf`);
-}
     // --- INICIALIZACIÓN ---
     window.onload = function() {
         renderizarTablaDependencias();
